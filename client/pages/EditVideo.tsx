@@ -436,10 +436,12 @@ export default function EditVideo() {
               )}
 
               {/* Split point indicator */}
-              {editMode === "split" && (
+              {editMode === "split" && duration > 0 && (
                 <div
                   className="absolute top-0 bottom-0 w-1 bg-red-500"
-                  style={{ left: `${(splitPoint / duration) * 100}%` }}
+                  style={{
+                    left: `${Math.max(0, Math.min(100, (splitPoint / duration) * 100))}%`,
+                  }}
                 >
                   <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
                     <Scissors className="h-4 w-4 text-red-500" />
