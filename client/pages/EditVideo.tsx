@@ -27,6 +27,8 @@ export default function EditVideo() {
   const [splitPoint, setSplitPoint] = useState(0);
   const [uploadData, setUploadData] = useState<any>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
+  const [trimmedVideoUrl, setTrimmedVideoUrl] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // Load upload data from localStorage
