@@ -103,7 +103,19 @@ export default function EditVideo() {
   const seekToTime = (time: number) => {
     const video = videoRef.current;
     if (!video) return;
-    video.currentTime = time;
+
+    if (uploadData?.trimMetadata) {
+      // If video is trimmed, seek relative to trim start
+      const { trimStart, trimEnd } = uploadData.trimMetadata;
+      const actualTime = trimStart + time;
+      video.currentTime = Math.max(
+        trimStart,
+        Math.min(actualTime, trimEnd - 0.1),
+      );
+    } else {
+      video.currentTime = time;
+    }
+
     setCurrentTime(time);
   };
 
