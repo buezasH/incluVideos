@@ -121,83 +121,62 @@ export default function EditVideo() {
 
     try {
       const video = videoRef.current;
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
 
-      if (!ctx) {
-        throw new Error("Could not get canvas context");
+      // Simple approach: create a trimmed version by modifying video playback
+      const trimmedDuration = trimEnd - trimStart;
+
+      // Create a new video element for the trimmed version
+      const trimmedVideo = document.createElement("video");
+      trimmedVideo.src = videoUrl;
+      trimmedVideo.crossOrigin = "anonymous";
+
+      // Set up the trimmed video with proper metadata
+      await new Promise<void>((resolve, reject) => {
+        trimmedVideo.onloadedmetadata = () => {
+          // Update our state with the new trimmed duration
+          setDuration(trimmedDuration);
+          setCurrentTime(0);
+          setTrimmedVideoUrl(videoUrl); // Use original URL but track trim points
+
+          // Update the main video element
+          if (videoRef.current) {
+            videoRef.current.currentTime = trimStart;
+          }
+
+          resolve();
+        };
+
+        trimmedVideo.onerror = () => {
+          reject(new Error("Failed to load video for trimming"));
+        };
+
+        trimmedVideo.load();
+      });
+
+      // Store trim metadata for playback control
+      const trimMetadata = {
+        originalUrl: videoUrl,
+        trimStart,
+        trimEnd,
+        trimmedDuration,
+      };
+
+      // Store trim data in component state for upload
+      setUploadData((prev) => ({
+        ...prev,
+        trimMetadata,
+      }));
+
+      setIsProcessing(false);
+      setEditMode(null);
+
+      // Reset video to trimmed start point
+      if (videoRef.current) {
+        videoRef.current.currentTime = trimStart;
       }
-
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      // Create MediaRecorder to capture the trimmed video
-      const stream = canvas.captureStream(30); // 30 FPS
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
-      });
-
-      const chunks: Blob[] = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const trimmedBlob = new Blob(chunks, { type: "video/webm" });
-        const trimmedUrl = URL.createObjectURL(trimmedBlob);
-        setTrimmedVideoUrl(trimmedUrl);
-        setVideoUrl(trimmedUrl);
-        setIsProcessing(false);
-        setEditMode(null);
-
-        // Reset video to show trimmed version
-        if (videoRef.current) {
-          videoRef.current.src = trimmedUrl;
-          videoRef.current.load();
-        }
-      };
-
-      // Start recording
-      mediaRecorder.start();
-
-      // Pause the original video and seek to trim start
-      video.pause();
-      video.currentTime = trimStart;
-
-      await new Promise<void>((resolve) => {
-        video.onseeked = () => resolve();
-      });
-
-      // Function to draw frames during the trim duration
-      const drawFrame = () => {
-        if (video.currentTime >= trimEnd) {
-          mediaRecorder.stop();
-          return;
-        }
-
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Advance video time by a small amount (1/30 second for 30fps)
-        video.currentTime += 1 / 30;
-
-        if (video.currentTime < trimEnd) {
-          requestAnimationFrame(drawFrame);
-        } else {
-          mediaRecorder.stop();
-        }
-      };
-
-      // Start drawing frames
-      drawFrame();
     } catch (error) {
       console.error("Error trimming video:", error);
-      alert(
-        "Error trimming video. This feature requires a modern browser with MediaRecorder support.",
-      );
+      alert("Error trimming video. Please try again.");
       setIsProcessing(false);
     }
   };
