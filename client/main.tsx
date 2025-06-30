@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import UploadVideo from "./pages/UploadVideo";
 import EditVideo from "./pages/EditVideo";
+import VideoGallery from "./pages/VideoGallery";
 import WatchVideo from "./pages/WatchVideo";
 import MyLists from "./pages/MyLists";
 import Recommendations from "./pages/Recommendations";
