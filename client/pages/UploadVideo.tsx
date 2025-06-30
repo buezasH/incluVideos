@@ -75,11 +75,12 @@ export default function UploadVideo() {
     }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     if (file && file.type.startsWith("video/")) {
       setUploadedFile(file);
+      await generateThumbnail(file);
     } else if (file) {
       alert("Please drop a video file (.mp4, .avi, .mov, .wmv)");
     }
