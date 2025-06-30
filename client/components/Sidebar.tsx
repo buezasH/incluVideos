@@ -20,7 +20,7 @@ const navigation = [
   { name: "My Lists", href: "/lists", icon: List },
   { name: "Recommendations", href: "/recommendations", icon: Lightbulb },
   { name: "Upload Videos", href: "/upload", icon: Upload },
-  { name: "Edit Videos", href: "/edit", icon: Edit },
+  { name: "Edit Videos", href: "/edit-videos", icon: Edit },
 ];
 
 export function Sidebar() {
