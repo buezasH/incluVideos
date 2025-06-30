@@ -33,8 +33,12 @@ export default function EditVideo() {
   const [isExistingVideo, setIsExistingVideo] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      // Editing existing video
+    // Check if we're on /edit-videos/:id route (editing existing video)
+    const isEditVideosRoute =
+      window.location.pathname.startsWith("/edit-videos/");
+
+    if (id && isEditVideosRoute) {
+      // Editing existing video from gallery
       const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
       const existingVideo = userVideos.find((v: any) => v.id.toString() === id);
 
@@ -54,10 +58,10 @@ export default function EditVideo() {
         }
       } else {
         // Video not found, redirect to gallery
-        navigate("/edit");
+        navigate("/edit-videos");
       }
     } else {
-      // New upload from upload page
+      // New upload from upload page (/edit route)
       const storedData = localStorage.getItem("pendingVideoUpload");
       if (storedData) {
         const data = JSON.parse(storedData);
