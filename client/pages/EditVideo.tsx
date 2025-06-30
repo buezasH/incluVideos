@@ -19,8 +19,12 @@ export default function EditVideo() {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(30);
-  const [splitTime, setSplitTime] = useState(30);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [editMode, setEditMode] = useState<"trim" | "split" | null>(null);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
+  const [splitPoint, setSplitPoint] = useState(0);
   const [uploadData, setUploadData] = useState<any>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
 
