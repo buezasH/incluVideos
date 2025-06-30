@@ -125,8 +125,8 @@ export default function EditVideo() {
     const clickPercent = clickX / rect.width;
     const newTime = clickPercent * duration;
 
-    if (editMode === "trim") {
-      // Set trim points based on click
+    if (editMode === "trim" && !trimmedVideoUrl) {
+      // Set trim points based on click (only if not already trimmed)
       if (Math.abs(newTime - trimStart) < Math.abs(newTime - trimEnd)) {
         setTrimStart(Math.max(0, Math.min(newTime, trimEnd - 1)));
       } else {
