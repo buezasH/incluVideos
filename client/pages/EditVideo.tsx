@@ -334,7 +334,7 @@ export default function EditVideo() {
     <Layout>
       <div className="p-6">
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          Upload Video
+          {isExistingVideo ? "Edit Video" : "Upload Video"}
         </h1>
 
         {/* Video Player */}
