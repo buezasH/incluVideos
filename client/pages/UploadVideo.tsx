@@ -186,6 +186,8 @@ export default function UploadVideo() {
                   id="title"
                   placeholder="Write video title..."
                   className="mt-2"
+                  value={videoTitle}
+                  onChange={(e) => setVideoTitle(e.target.value)}
                 />
               </div>
 
@@ -195,6 +197,8 @@ export default function UploadVideo() {
                   id="description"
                   placeholder="Write video Description..."
                   className="mt-2 min-h-[100px]"
+                  value={videoDescription}
+                  onChange={(e) => setVideoDescription(e.target.value)}
                 />
               </div>
 
