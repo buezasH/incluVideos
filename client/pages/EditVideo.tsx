@@ -295,7 +295,7 @@ export default function EditVideo() {
         title: uploadData.title,
         description: uploadData.description,
         videoUrl: videoUrl,
-        thumbnail: videoUrl,
+        thumbnail: uploadData.thumbnail || videoUrl,
         author: {
           name: "Current User",
           avatar: "/placeholder.svg",
