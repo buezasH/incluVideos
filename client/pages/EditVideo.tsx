@@ -259,43 +259,65 @@ export default function EditVideo() {
   };
 
   const handleUploadVideo = () => {
-    // Create a new video entry and clear upload data
-    const videoId = Date.now(); // Simple ID generation
     const trimMetadata = uploadData?.trimMetadata;
 
-    const finalVideoData = {
-      id: videoId,
-      title: uploadData.title,
-      description: uploadData.description,
-      videoUrl: videoUrl,
-      thumbnail: videoUrl, // In real app, would generate thumbnail
-      author: {
-        name: "Current User",
-        avatar: "/placeholder.svg",
-        title: "Content Creator",
-        videoCount: 1,
-      },
-      uploadedAt: new Date().toISOString(),
-      originalDuration: trimMetadata
-        ? trimMetadata.trimEnd - trimMetadata.trimStart
-        : duration,
-      finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
-      wasTrimmed: !!trimMetadata,
-      trimData: trimMetadata || null,
-    };
+    if (isExistingVideo && id) {
+      // Update existing video
+      const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
+      const videoIndex = userVideos.findIndex(
+        (v: any) => v.id.toString() === id,
+      );
 
-    // Store the new video (in real app, would send to server)
-    const existingVideos = JSON.parse(
-      localStorage.getItem("userVideos") || "[]",
-    );
-    existingVideos.push(finalVideoData);
-    localStorage.setItem("userVideos", JSON.stringify(existingVideos));
+      if (videoIndex !== -1) {
+        userVideos[videoIndex] = {
+          ...userVideos[videoIndex],
+          title: uploadData.title,
+          description: uploadData.description,
+          finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
+          wasTrimmed: !!trimMetadata,
+          trimData: trimMetadata || null,
+          lastEditedAt: new Date().toISOString(),
+        };
 
-    // Clear upload data
-    localStorage.removeItem("pendingVideoUpload");
+        localStorage.setItem("userVideos", JSON.stringify(userVideos));
+        navigate(`/watch/${id}`);
+      }
+    } else {
+      // Create new video entry
+      const videoId = Date.now();
 
-    // Navigate to watch the uploaded video
-    navigate(`/watch/${videoId}`);
+      const finalVideoData = {
+        id: videoId,
+        title: uploadData.title,
+        description: uploadData.description,
+        videoUrl: videoUrl,
+        thumbnail: videoUrl,
+        author: {
+          name: "Current User",
+          avatar: "/placeholder.svg",
+          title: "Content Creator",
+          videoCount: 1,
+        },
+        uploadedAt: new Date().toISOString(),
+        originalDuration: trimMetadata
+          ? trimMetadata.trimEnd - trimMetadata.trimStart
+          : duration,
+        finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
+        wasTrimmed: !!trimMetadata,
+        trimData: trimMetadata || null,
+      };
+
+      const existingVideos = JSON.parse(
+        localStorage.getItem("userVideos") || "[]",
+      );
+      existingVideos.push(finalVideoData);
+      localStorage.setItem("userVideos", JSON.stringify(existingVideos));
+
+      // Clear upload data for new videos
+      localStorage.removeItem("pendingVideoUpload");
+
+      navigate(`/watch/${videoId}`);
+    }
   };
 
   if (!uploadData) {
