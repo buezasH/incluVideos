@@ -117,21 +117,65 @@ export default function UploadVideo() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Upload Area */}
           <div className="lg:col-span-2">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-lg flex items-center justify-center">
-                <Upload className="h-8 w-8 text-green-600" />
-              </div>
-              <p className="text-gray-600 mb-2">
-                <span className="font-medium">Drag & drop</span> your video here
-                or <span className="font-medium text-primary">click</span> to
-                upload.
-              </p>
-              <p className="text-sm text-gray-500 mb-4">
-                (.mp4, .avi, .mov, .wmv - Max 500 MB)
-              </p>
-              <Button className="bg-primary hover:bg-primary/90">
-                Browse File
-              </Button>
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                uploadedFile
+                  ? "border-green-300 bg-green-50"
+                  : "border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5"
+              }`}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
+              {uploadedFile ? (
+                <div>
+                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Upload className="h-8 w-8 text-green-600" />
+                  </div>
+                  <p className="text-green-700 font-medium mb-2">
+                    Video uploaded successfully!
+                  </p>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {uploadedFile.name} (
+                    {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={handleBrowseClick}
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
+                  >
+                    Change File
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Upload className="h-8 w-8 text-green-600" />
+                  </div>
+                  <p className="text-gray-600 mb-2">
+                    <span className="font-medium">Drag & drop</span> your video
+                    here or{" "}
+                    <span className="font-medium text-primary">click</span> to
+                    upload.
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    (.mp4, .avi, .mov, .wmv - Max 500 MB)
+                  </p>
+                  <Button
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={handleBrowseClick}
+                  >
+                    Browse File
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Form Fields */}
