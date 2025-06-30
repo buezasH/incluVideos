@@ -385,11 +385,11 @@ export default function EditVideo() {
               <div className="flex h-full">
                 {Array.from({ length: 10 }, (_, i) => (
                   <div key={i} className="flex-1 border-r border-gray-200">
-                    <video
-                      src={videoUrl}
-                      className="w-full h-full object-cover pointer-events-none"
-                      style={{ currentTime: (i / 10) * duration }}
-                    />
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                      {duration > 0
+                        ? `${Math.floor((i / 10) * duration)}s`
+                        : "Loading..."}
+                    </div>
                   </div>
                 ))}
               </div>
