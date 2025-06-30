@@ -24,6 +24,48 @@ export default function EditVideo() {
   const [uploadData, setUploadData] = useState<any>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
 
+  useEffect(() => {
+    // Load upload data from localStorage
+    const storedData = localStorage.getItem("pendingVideoUpload");
+    if (storedData) {
+      const data = JSON.parse(storedData);
+      setUploadData(data);
+      setVideoUrl(data.fileUrl);
+    } else {
+      // If no upload data, redirect to upload page
+      navigate("/upload");
+    }
+  }, [navigate]);
+
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+    } else {
+      video.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleUploadVideo = () => {
+    // Clear the upload data and navigate to success page or video library
+    localStorage.removeItem("pendingVideoUpload");
+    alert("Video uploaded successfully!");
+    navigate("/");
+  };
+
+  if (!uploadData) {
+    return (
+      <Layout>
+        <div className="p-6">
+          <div className="text-center">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="p-6">
