@@ -297,6 +297,30 @@ export default function VideoGallery() {
           </div>
         </div>
       </div>
+
+      {/* Remove Video Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Video</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{videoToRemove?.title}"? This
+              action cannot be undone and the video will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelRemoveVideo}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRemoveVideo}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Remove Video
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
