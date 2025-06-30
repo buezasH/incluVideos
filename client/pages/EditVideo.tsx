@@ -41,6 +41,23 @@ export default function EditVideo() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      const videoDuration = video.duration;
+      setDuration(videoDuration);
+      setTrimStart(0);
+      setTrimEnd(videoDuration);
+      setSplitPoint(videoDuration / 2);
+    };
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    return () =>
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+  }, [videoUrl]);
+
   const togglePlayPause = () => {
     const video = videoRef.current;
     if (!video) return;
