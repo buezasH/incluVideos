@@ -37,6 +37,8 @@ export default function UploadVideo() {
   const [visibility, setVisibility] = useState("public");
   const [category, setCategory] = useState("life-skills");
   const [language, setLanguage] = useState("english");
+  const [thumbnail, setThumbnail] = useState<string>("");
+  const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false);
 
   const handleTagRemove = (tagToRemove: string) => {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
