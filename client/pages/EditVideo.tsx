@@ -453,7 +453,7 @@ export default function EditVideo() {
               <div
                 className="absolute top-0 bottom-0 w-1 bg-primary z-10"
                 style={{
-                  left: `${duration ? (currentTime / duration) * 100 : 0}%`,
+                  left: `${duration > 0 ? Math.max(0, Math.min(100, (currentTime / duration) * 100)) : 0}%`,
                 }}
               >
                 <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
