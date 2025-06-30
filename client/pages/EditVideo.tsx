@@ -12,12 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Play, Pause, Volume2, Maximize, Scissors } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function EditVideo() {
+  const navigate = useNavigate();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(30);
   const [splitTime, setSplitTime] = useState(30);
+  const [uploadData, setUploadData] = useState<any>(null);
+  const [videoUrl, setVideoUrl] = useState<string>("");
 
   return (
     <Layout>
