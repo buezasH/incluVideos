@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function EditVideo() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -29,6 +30,7 @@ export default function EditVideo() {
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [trimmedVideoUrl, setTrimmedVideoUrl] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isExistingVideo, setIsExistingVideo] = useState(false);
 
   useEffect(() => {
     // Load upload data from localStorage
