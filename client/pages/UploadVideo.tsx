@@ -231,7 +231,7 @@ export default function UploadVideo() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Category</Label>
-                  <Select defaultValue="life-skills">
+                  <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
@@ -247,7 +247,7 @@ export default function UploadVideo() {
 
                 <div>
                   <Label>Language</Label>
-                  <Select defaultValue="english">
+                  <Select value={language} onValueChange={setLanguage}>
                     <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
