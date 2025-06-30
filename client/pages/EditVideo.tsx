@@ -445,7 +445,19 @@ export default function EditVideo() {
 
             {/* Edit status and controls */}
             <div className="flex items-center justify-center space-x-4">
-              {editMode === "trim" && (
+              {isProcessing && (
+                <div className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded flex items-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  Processing video trim...
+                </div>
+              )}
+              {!isProcessing && trimmedVideoUrl && (
+                <div className="text-sm text-green-600 bg-green-50 px-3 py-1 rounded">
+                  ✓ Video trimmed successfully! Duration:{" "}
+                  {Math.floor(trimEnd - trimStart)}s
+                </div>
+              )}
+              {!isProcessing && !trimmedVideoUrl && editMode === "trim" && (
                 <div className="text-sm text-gray-600 bg-green-50 px-3 py-1 rounded">
                   Trim: {Math.floor(trimStart)}s - {Math.floor(trimEnd)}s (
                   {Math.floor(trimEnd - trimStart)}s duration)
@@ -456,7 +468,7 @@ export default function EditVideo() {
                   Split at: {Math.floor(splitPoint)}s
                 </div>
               )}
-              {!editMode && (
+              {!editMode && !trimmedVideoUrl && !isProcessing && (
                 <div className="text-sm text-gray-600">
                   Click timeline to seek, or use Trim/Split buttons to edit
                 </div>
