@@ -142,7 +142,18 @@ export default function WatchVideo() {
 
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
-    videoElement.currentTime = percent * duration;
+
+    if (video.trimData) {
+      // For trimmed videos, seek within the trim boundaries
+      const { trimStart, trimEnd } = video.trimData;
+      const seekTime = trimStart + percent * (trimEnd - trimStart);
+      videoElement.currentTime = Math.max(
+        trimStart,
+        Math.min(seekTime, trimEnd - 0.1),
+      );
+    } else {
+      videoElement.currentTime = percent * duration;
+    }
   };
 
   const formatTime = (time: number) => {
