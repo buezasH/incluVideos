@@ -31,11 +31,11 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-            </div>
-          </div>
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2Fc17e835299d843818fd55ba7cc68e657%2F3bfe50a8cf3c410f963ff936b43c7b38?format=webp&width=800"
+            alt="IncluVid Logo"
+            className="w-8 h-8 object-contain"
+          />
           <span className="font-semibold text-lg">IncluVid</span>
         </div>
       </div>
