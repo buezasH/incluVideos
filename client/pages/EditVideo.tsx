@@ -457,7 +457,10 @@ export default function EditVideo() {
             <Button variant="outline" className="flex-1">
               ← Back
             </Button>
-            <Button className="flex-1 bg-primary hover:bg-primary/90">
+            <Button
+              className="flex-1 bg-primary hover:bg-primary/90"
+              onClick={handleUploadVideo}
+            >
               Upload Video →
             </Button>
           </div>
