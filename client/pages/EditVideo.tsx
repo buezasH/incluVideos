@@ -246,25 +246,77 @@ export default function EditVideo() {
             </div>
 
             {/* Timeline bar with thumbnails */}
-            <div className="relative h-16 bg-gray-100 rounded-lg overflow-hidden">
+            <div
+              className="relative h-16 bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+              onClick={handleTimelineClick}
+            >
               <div className="flex h-full">
                 {Array.from({ length: 10 }, (_, i) => (
                   <div key={i} className="flex-1 border-r border-gray-200">
-                    <img
-                      src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=60&fit=crop"
-                      alt={`Frame ${i + 1}`}
-                      className="w-full h-full object-cover"
+                    <video
+                      src={videoUrl}
+                      className="w-full h-full object-cover pointer-events-none"
+                      style={{ currentTime: (i / 10) * duration }}
                     />
                   </div>
                 ))}
               </div>
+
+              {/* Trim overlay */}
+              {editMode === "trim" && (
+                <>
+                  {/* Dimmed areas outside trim range */}
+                  <div
+                    className="absolute top-0 bottom-0 bg-black bg-opacity-50"
+                    style={{
+                      left: 0,
+                      width: `${(trimStart / duration) * 100}%`,
+                    }}
+                  />
+                  <div
+                    className="absolute top-0 bottom-0 bg-black bg-opacity-50"
+                    style={{ left: `${(trimEnd / duration) * 100}%`, right: 0 }}
+                  />
+
+                  {/* Trim start handle */}
+                  <div
+                    className="absolute top-0 bottom-0 w-2 bg-green-500 cursor-ew-resize"
+                    style={{ left: `${(trimStart / duration) * 100}%` }}
+                  >
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-green-500 rounded"></div>
+                  </div>
+
+                  {/* Trim end handle */}
+                  <div
+                    className="absolute top-0 bottom-0 w-2 bg-green-500 cursor-ew-resize"
+                    style={{ left: `${(trimEnd / duration) * 100}%` }}
+                  >
+                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-green-500 rounded"></div>
+                  </div>
+                </>
+              )}
+
+              {/* Split point indicator */}
+              {editMode === "split" && (
+                <div
+                  className="absolute top-0 bottom-0 w-1 bg-red-500"
+                  style={{ left: `${(splitPoint / duration) * 100}%` }}
+                >
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                    <Scissors className="h-4 w-4 text-red-500" />
+                  </div>
+                </div>
+              )}
+
               {/* Current time indicator */}
               <div
-                className="absolute top-0 bottom-0 w-1 bg-primary"
-                style={{ left: `${currentTime}%` }}
+                className="absolute top-0 bottom-0 w-1 bg-primary z-10"
+                style={{
+                  left: `${duration ? (currentTime / duration) * 100 : 0}%`,
+                }}
               >
                 <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                  <Scissors className="h-4 w-4 text-primary" />
+                  <div className="w-3 h-3 bg-primary rounded-full border-2 border-white"></div>
                 </div>
               </div>
             </div>
