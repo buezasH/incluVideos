@@ -1,0 +1,143 @@
+import { Layout } from "@/components/Layout";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Play,
+  Pause,
+  Volume2,
+  Maximize,
+  SkipBack,
+  SkipForward,
+  MoreHorizontal,
+  Share,
+} from "lucide-react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+
+export default function WatchVideo() {
+  const { id } = useParams();
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <Layout>
+      <div className="p-6 max-w-5xl">
+        {/* Video Player */}
+        <div className="bg-white rounded-lg overflow-hidden mb-6 shadow-sm">
+          <div className="relative bg-gray-900 aspect-video">
+            <img
+              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=450&fit=crop"
+              alt="Breakfast helps you start the day with energy"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-16 w-16 bg-white/20 hover:bg-white/30 text-white"
+                onClick={() => setIsPlaying(!isPlaying)}
+              >
+                {isPlaying ? (
+                  <Pause className="h-8 w-8" />
+                ) : (
+                  <Play className="h-8 w-8" />
+                )}
+              </Button>
+            </div>
+
+            {/* Video Controls */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+              {/* Progress Bar */}
+              <div className="w-full bg-white/20 rounded-full h-1 mb-4">
+                <div
+                  className="bg-primary h-1 rounded-full"
+                  style={{ width: "25%" }}
+                ></div>
+              </div>
+
+              <div className="flex items-center justify-between text-white">
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  >
+                    <SkipBack className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                    onClick={() => setIsPlaying(!isPlaying)}
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-6 w-6" />
+                    ) : (
+                      <Play className="h-6 w-6" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  >
+                    <SkipForward className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  >
+                    <Volume2 className="h-5 w-5" />
+                  </Button>
+                  <span className="text-sm">0:05 / 02:25</span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
+                  >
+                    <Maximize className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Video Info */}
+        <div className="bg-white rounded-lg p-6">
+          <h1 className="text-xl font-semibold text-gray-900 mb-4">
+            Breakfast helps you start the day with energy.
+          </h1>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src="/placeholder.svg" alt="Sarah Connors" />
+                <AvatarFallback>SC</AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium text-gray-900">Sarah Connors</div>
+                <div className="text-sm text-gray-600">
+                  Caregiver • 42 Educational Videos
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Button className="bg-primary hover:bg-primary/90">
+                <Share className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
