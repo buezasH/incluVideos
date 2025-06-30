@@ -283,10 +283,18 @@ export default function UploadVideo() {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <Button variant="outline" className="flex-1">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => navigate("/")}
+                >
                   Back
                 </Button>
-                <Button className="flex-1 bg-primary hover:bg-primary/90">
+                <Button
+                  className="flex-1 bg-primary hover:bg-primary/90"
+                  onClick={handleContinue}
+                  disabled={!uploadedFile || !videoTitle.trim()}
+                >
                   Continue →
                 </Button>
               </div>
