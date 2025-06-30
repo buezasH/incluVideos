@@ -76,6 +76,42 @@ export default function VideoGallery() {
     navigate("/upload");
   };
 
+  const handleRemoveVideo = (video: UserVideo, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent triggering edit action
+    setVideoToRemove(video);
+    setShowRemoveDialog(true);
+  };
+
+  const confirmRemoveVideo = () => {
+    if (!videoToRemove) return;
+
+    // Remove from localStorage
+    const updatedVideos = userVideos.filter(
+      (video) => video.id !== videoToRemove.id,
+    );
+    localStorage.setItem("userVideos", JSON.stringify(updatedVideos));
+
+    // Update state
+    setUserVideos(updatedVideos);
+    setFilteredVideos(
+      updatedVideos.filter(
+        (video) =>
+          searchQuery.trim() === "" ||
+          video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          video.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    );
+
+    // Close dialog
+    setShowRemoveDialog(false);
+    setVideoToRemove(null);
+  };
+
+  const cancelRemoveVideo = () => {
+    setShowRemoveDialog(false);
+    setVideoToRemove(null);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
