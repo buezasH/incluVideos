@@ -112,18 +112,18 @@ export default function UploadVideo() {
             Upload Video
           </h1>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8 h-full">
             {/* Upload Area */}
-            <div className="xl:col-span-2">
-            <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                uploadedFile
-                  ? 'border-green-300 bg-green-50'
-                  : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
-              }`}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
+            <div className="xl:col-span-2 flex flex-col">
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 sm:p-8 lg:p-12 text-center transition-colors min-h-[300px] flex flex-col justify-center ${
+                  uploadedFile
+                    ? 'border-green-300 bg-green-50'
+                    : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
+                }`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+              >
               <input
                 ref={fileInputRef}
                 type="file"
