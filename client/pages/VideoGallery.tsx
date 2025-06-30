@@ -203,23 +203,34 @@ export default function VideoGallery() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredVideos.map((video) => (
                   <div key={video.id} className="group relative">
-                    <div
-                      className="bg-white rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-all cursor-pointer"
-                      onClick={() => handleEditVideo(video.id)}
-                    >
+                    <div className="bg-white rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-all">
                       <div className="relative">
                         <img
                           src={video.thumbnail}
                           alt={video.title}
                           className="w-full h-48 object-cover"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
-                          <Button
-                            variant="ghost"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-white bg-black/50 hover:bg-black/70"
-                          >
-                            Edit Video
-                          </Button>
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-white bg-black/60 hover:bg-black/80 flex items-center gap-1"
+                              onClick={() => handleEditVideo(video.id)}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-white bg-red-600/80 hover:bg-red-700/90 flex items-center gap-1"
+                              onClick={(e) => handleRemoveVideo(video, e)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Remove
+                            </Button>
+                          </div>
                         </div>
                         <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
                           {formatDuration(video.finalDuration)}
