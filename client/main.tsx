@@ -18,23 +18,21 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/upload" element={<UploadVideo />} />
-          <Route path="/edit" element={<EditVideo />} />
-          <Route path="/watch/:id" element={<WatchVideo />} />
-          <Route path="/lists" element={<MyLists />} />
-          <Route path="/recommendations" element={<Recommendations />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/upload" element={<UploadVideo />} />
+        <Route path="/edit" element={<EditVideo />} />
+        <Route path="/watch/:id" element={<WatchVideo />} />
+        <Route path="/lists" element={<MyLists />} />
+        <Route path="/recommendations" element={<Recommendations />} />
+        <Route path="/settings" element={<Settings />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
