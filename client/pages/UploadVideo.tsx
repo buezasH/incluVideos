@@ -103,7 +103,7 @@ export default function UploadVideo() {
       }),
     );
 
-    // Navigate to edit page
+    // Navigate to edit page for new upload
     navigate("/edit");
   };
 
