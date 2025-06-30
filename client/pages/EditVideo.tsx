@@ -55,10 +55,38 @@ export default function EditVideo() {
       setSplitPoint(videoDuration / 2);
     };
 
+    const handleTimeUpdate = () => {
+      const video = videoRef.current;
+      if (!video || !trimmedVideoUrl) return;
+
+      // If we have a trimmed video, enforce boundaries
+      if (uploadData?.trimMetadata) {
+        const { trimStart, trimEnd } = uploadData.trimMetadata;
+        const actualTime = video.currentTime;
+
+        if (actualTime < trimStart) {
+          video.currentTime = trimStart;
+        } else if (actualTime >= trimEnd) {
+          video.currentTime = trimStart;
+          video.pause();
+          setIsPlaying(false);
+        }
+
+        // Set relative time for display (0 to trimmed duration)
+        setCurrentTime(Math.max(0, actualTime - trimStart));
+      } else {
+        setCurrentTime(video.currentTime);
+      }
+    };
+
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    return () =>
+    video.addEventListener("timeupdate", handleTimeUpdate);
+
+    return () => {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-  }, [videoUrl]);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+  }, [videoUrl, trimmedVideoUrl, uploadData]);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
