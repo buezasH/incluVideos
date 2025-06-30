@@ -124,10 +124,43 @@ export default function EditVideo() {
   };
 
   const handleUploadVideo = () => {
-    // Clear the upload data and navigate to success page or video library
+    // Create a new video entry and clear upload data
+    const videoId = Date.now(); // Simple ID generation
+    const finalVideoData = {
+      id: videoId,
+      title: uploadData.title,
+      description: uploadData.description,
+      videoUrl: videoUrl,
+      thumbnail: videoUrl, // In real app, would generate thumbnail
+      author: {
+        name: "Current User",
+        avatar: "/placeholder.svg",
+        title: "Content Creator",
+        videoCount: 1,
+      },
+      uploadedAt: new Date().toISOString(),
+      edits: editMode
+        ? {
+            type: editMode,
+            trimStart: editMode === "trim" ? trimStart : null,
+            trimEnd: editMode === "trim" ? trimEnd : null,
+            splitPoint: editMode === "split" ? splitPoint : null,
+          }
+        : null,
+    };
+
+    // Store the new video (in real app, would send to server)
+    const existingVideos = JSON.parse(
+      localStorage.getItem("userVideos") || "[]",
+    );
+    existingVideos.push(finalVideoData);
+    localStorage.setItem("userVideos", JSON.stringify(existingVideos));
+
+    // Clear upload data
     localStorage.removeItem("pendingVideoUpload");
-    alert("Video uploaded successfully!");
-    navigate("/");
+
+    // Navigate to watch the uploaded video
+    navigate(`/watch/${videoId}`);
   };
 
   if (!uploadData) {
