@@ -25,7 +25,8 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/upload" element={<UploadVideo />} />
-        <Route path="/edit" element={<EditVideo />} />
+        <Route path="/edit" element={<VideoGallery />} />
+        <Route path="/edit/:id" element={<EditVideo />} />
         <Route path="/watch/:id" element={<WatchVideo />} />
         <Route path="/lists" element={<MyLists />} />
         <Route path="/recommendations" element={<Recommendations />} />
