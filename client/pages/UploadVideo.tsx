@@ -41,6 +41,72 @@ export default function UploadVideo() {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith("video/")) {
+      setUploadedFile(file);
+    } else if (file) {
+      alert("Please select a video file (.mp4, .avi, .mov, .wmv)");
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file && file.type.startsWith("video/")) {
+      setUploadedFile(file);
+    } else if (file) {
+      alert("Please drop a video file (.mp4, .avi, .mov, .wmv)");
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleContinue = () => {
+    if (!uploadedFile) {
+      alert("Please upload a video file first");
+      return;
+    }
+
+    if (!videoTitle.trim()) {
+      alert("Please enter a video title");
+      return;
+    }
+
+    // Store upload data in localStorage for the edit page
+    const uploadData = {
+      file: uploadedFile,
+      fileUrl: URL.createObjectURL(uploadedFile),
+      title: videoTitle,
+      description: videoDescription,
+      tags: selectedTags,
+      category,
+      language,
+      visibility,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      "pendingVideoUpload",
+      JSON.stringify({
+        ...uploadData,
+        file: null, // Can't stringify File object
+        fileName: uploadedFile.name,
+        fileSize: uploadedFile.size,
+        fileType: uploadedFile.type,
+      }),
+    );
+
+    // Navigate to edit page
+    navigate("/edit");
+  };
+
   return (
     <Layout>
       <div className="p-6 max-w-4xl">
