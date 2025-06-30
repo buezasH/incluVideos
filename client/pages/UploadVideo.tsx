@@ -115,6 +115,7 @@ export default function UploadVideo() {
       category,
       language,
       visibility,
+      thumbnail: thumbnail,
       uploadedAt: new Date().toISOString(),
     };
 
