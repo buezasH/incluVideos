@@ -66,17 +66,53 @@ export default function WatchVideo() {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
-    const updateTime = () => setCurrentTime(videoElement.currentTime);
-    const updateDuration = () => setDuration(videoElement.duration);
+    const updateTime = () => {
+      const videoEl = videoRef.current;
+      if (!videoEl) return;
+
+      // Handle trimmed videos
+      if (video.trimData) {
+        const { trimStart, trimEnd } = video.trimData;
+        const actualTime = videoEl.currentTime;
+
+        if (actualTime < trimStart) {
+          videoEl.currentTime = trimStart;
+        } else if (actualTime >= trimEnd) {
+          videoEl.currentTime = trimStart;
+          videoEl.pause();
+          setIsPlaying(false);
+        }
+
+        // Set relative time for display (0 to trimmed duration)
+        setCurrentTime(Math.max(0, actualTime - trimStart));
+      } else {
+        setCurrentTime(videoEl.currentTime);
+      }
+    };
+
+    const updateDuration = () => {
+      if (video.trimData) {
+        setDuration(video.finalDuration);
+      } else {
+        setDuration(videoElement.duration);
+      }
+    };
 
     videoElement.addEventListener("timeupdate", updateTime);
     videoElement.addEventListener("loadedmetadata", updateDuration);
+
+    // If video is trimmed, start at trim point
+    if (video.trimData) {
+      videoElement.addEventListener("loadedmetadata", () => {
+        videoElement.currentTime = video.trimData.trimStart;
+      });
+    }
 
     return () => {
       videoElement.removeEventListener("timeupdate", updateTime);
       videoElement.removeEventListener("loadedmetadata", updateDuration);
     };
-  }, []);
+  }, [video]);
 
   const togglePlayPause = () => {
     const videoElement = videoRef.current;
