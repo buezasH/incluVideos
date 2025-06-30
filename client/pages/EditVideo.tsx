@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Play, Pause, Volume2, Maximize, Scissors } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditVideo() {
   const navigate = useNavigate();
