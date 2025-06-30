@@ -395,25 +395,30 @@ export default function EditVideo() {
               </div>
 
               {/* Trim overlay */}
-              {editMode === "trim" && (
+              {editMode === "trim" && duration > 0 && (
                 <>
                   {/* Dimmed areas outside trim range */}
                   <div
                     className="absolute top-0 bottom-0 bg-black bg-opacity-50"
                     style={{
                       left: 0,
-                      width: `${(trimStart / duration) * 100}%`,
+                      width: `${Math.max(0, Math.min(100, (trimStart / duration) * 100))}%`,
                     }}
                   />
                   <div
                     className="absolute top-0 bottom-0 bg-black bg-opacity-50"
-                    style={{ left: `${(trimEnd / duration) * 100}%`, right: 0 }}
+                    style={{
+                      left: `${Math.max(0, Math.min(100, (trimEnd / duration) * 100))}%`,
+                      right: 0,
+                    }}
                   />
 
                   {/* Trim start handle */}
                   <div
                     className="absolute top-0 bottom-0 w-2 bg-green-500 cursor-ew-resize"
-                    style={{ left: `${(trimStart / duration) * 100}%` }}
+                    style={{
+                      left: `${Math.max(0, Math.min(100, (trimStart / duration) * 100))}%`,
+                    }}
                   >
                     <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-green-500 rounded"></div>
                   </div>
@@ -421,7 +426,9 @@ export default function EditVideo() {
                   {/* Trim end handle */}
                   <div
                     className="absolute top-0 bottom-0 w-2 bg-green-500 cursor-ew-resize"
-                    style={{ left: `${(trimEnd / duration) * 100}%` }}
+                    style={{
+                      left: `${Math.max(0, Math.min(100, (trimEnd / duration) * 100))}%`,
+                    }}
                   >
                     <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-green-500 rounded"></div>
                   </div>
