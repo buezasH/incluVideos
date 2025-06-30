@@ -58,23 +58,92 @@ export default function WatchVideo() {
 
   const video = videoData[id as keyof typeof videoData] || videoData[1];
 
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const updateTime = () => setCurrentTime(videoElement.currentTime);
+    const updateDuration = () => setDuration(videoElement.duration);
+
+    videoElement.addEventListener("timeupdate", updateTime);
+    videoElement.addEventListener("loadedmetadata", updateDuration);
+
+    return () => {
+      videoElement.removeEventListener("timeupdate", updateTime);
+      videoElement.removeEventListener("loadedmetadata", updateDuration);
+    };
+  }, []);
+
+  const togglePlayPause = () => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    if (isPlaying) {
+      videoElement.pause();
+    } else {
+      videoElement.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const skipTime = (seconds: number) => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    videoElement.currentTime = Math.max(
+      0,
+      Math.min(videoElement.duration, videoElement.currentTime + seconds),
+    );
+  };
+
+  const handleProgressClick = (e: React.MouseEvent) => {
+    const videoElement = videoRef.current;
+    if (!videoElement || !duration) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    videoElement.currentTime = percent * duration;
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const toggleFullscreen = () => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      videoElement.requestFullscreen();
+    }
+  };
+
   return (
     <Layout>
       <div className="p-6 max-w-5xl">
         {/* Video Player */}
         <div className="bg-white rounded-lg overflow-hidden mb-6 shadow-sm">
-          <div className="relative bg-gray-900 aspect-video">
-            <img
-              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=450&fit=crop"
-              alt="Breakfast helps you start the day with energy"
+          <div className="relative bg-gray-900 aspect-video group">
+            <video
+              ref={videoRef}
+              src={video.videoUrl}
+              poster={video.thumbnail}
               className="w-full h-full object-cover"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
             />
-            <div className="absolute inset-0 flex items-center justify-center">
+
+            {/* Central Play Button */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-16 w-16 bg-white/20 hover:bg-white/30 text-white"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={togglePlayPause}
               >
                 {isPlaying ? (
                   <Pause className="h-8 w-8" />
