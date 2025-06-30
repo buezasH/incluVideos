@@ -154,12 +154,19 @@ export default function WatchVideo() {
             </div>
 
             {/* Video Controls */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
               {/* Progress Bar */}
-              <div className="w-full bg-white/20 rounded-full h-1 mb-4">
+              <div
+                className="w-full bg-white/20 rounded-full h-1 mb-4 cursor-pointer"
+                onClick={handleProgressClick}
+              >
                 <div
-                  className="bg-primary h-1 rounded-full"
-                  style={{ width: "25%" }}
+                  className="bg-primary h-1 rounded-full transition-all"
+                  style={{
+                    width: duration
+                      ? `${(currentTime / duration) * 100}%`
+                      : "0%",
+                  }}
                 ></div>
               </div>
 
@@ -169,6 +176,7 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
+                    onClick={() => skipTime(-10)}
                   >
                     <SkipBack className="h-5 w-5" />
                   </Button>
@@ -176,7 +184,7 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
-                    onClick={() => setIsPlaying(!isPlaying)}
+                    onClick={togglePlayPause}
                   >
                     {isPlaying ? (
                       <Pause className="h-6 w-6" />
@@ -188,6 +196,7 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
+                    onClick={() => skipTime(10)}
                   >
                     <SkipForward className="h-5 w-5" />
                   </Button>
@@ -195,10 +204,17 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
+                    onClick={() => {
+                      const newVolume = volume > 0 ? 0 : 1;
+                      setVolume(newVolume);
+                      if (videoRef.current) videoRef.current.volume = newVolume;
+                    }}
                   >
                     <Volume2 className="h-5 w-5" />
                   </Button>
-                  <span className="text-sm">0:05 / 02:25</span>
+                  <span className="text-sm">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -206,6 +222,7 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
+                    onClick={toggleFullscreen}
                   >
                     <Maximize className="h-5 w-5" />
                   </Button>
