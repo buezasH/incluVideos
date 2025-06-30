@@ -33,17 +33,43 @@ export default function EditVideo() {
   const [isExistingVideo, setIsExistingVideo] = useState(false);
 
   useEffect(() => {
-    // Load upload data from localStorage
-    const storedData = localStorage.getItem("pendingVideoUpload");
-    if (storedData) {
-      const data = JSON.parse(storedData);
-      setUploadData(data);
-      setVideoUrl(data.fileUrl);
+    if (id) {
+      // Editing existing video
+      const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
+      const existingVideo = userVideos.find((v: any) => v.id.toString() === id);
+
+      if (existingVideo) {
+        setIsExistingVideo(true);
+        setUploadData({
+          title: existingVideo.title,
+          description: existingVideo.description,
+          fileUrl: existingVideo.videoUrl,
+          trimMetadata: existingVideo.trimData,
+        });
+        setVideoUrl(existingVideo.videoUrl);
+
+        // If the video was previously trimmed, set up the trim data
+        if (existingVideo.trimData) {
+          setTrimmedVideoUrl(existingVideo.videoUrl);
+        }
+      } else {
+        // Video not found, redirect to gallery
+        navigate("/edit");
+      }
     } else {
-      // If no upload data, redirect to upload page
-      navigate("/upload");
+      // New upload from upload page
+      const storedData = localStorage.getItem("pendingVideoUpload");
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        setUploadData(data);
+        setVideoUrl(data.fileUrl);
+        setIsExistingVideo(false);
+      } else {
+        // If no upload data, redirect to upload page
+        navigate("/upload");
+      }
     }
-  }, [navigate]);
+  }, [id, navigate]);
 
   useEffect(() => {
     const video = videoRef.current;
