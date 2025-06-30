@@ -44,12 +44,34 @@ export default function UploadVideo() {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith("video/")) {
       setUploadedFile(file);
+      await generateThumbnail(file);
     } else if (file) {
       alert("Please select a video file (.mp4, .avi, .mov, .wmv)");
+    }
+  };
+
+  const generateThumbnail = async (file: File) => {
+    setIsGeneratingThumbnail(true);
+    try {
+      const thumbnailDataUrl = await generateVideoThumbnailWithSize(
+        file,
+        400,
+        300,
+        2,
+      );
+      setThumbnail(thumbnailDataUrl);
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+      // Fallback to a placeholder or keep empty
+      setThumbnail("");
+    } finally {
+      setIsGeneratingThumbnail(false);
     }
   };
 
