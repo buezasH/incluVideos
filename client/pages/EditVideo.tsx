@@ -273,7 +273,7 @@ export default function EditVideo() {
           <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-4">
             <video
               ref={videoRef}
-              src={videoUrl}
+              src={trimmedVideoUrl || videoUrl}
               className="w-full h-96 object-cover"
               onTimeUpdate={(e) =>
                 setCurrentTime((e.target as HTMLVideoElement).currentTime)
