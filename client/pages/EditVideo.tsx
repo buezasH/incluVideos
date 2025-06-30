@@ -647,7 +647,9 @@ export default function EditVideo() {
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => navigate(isExistingVideo ? "/edit" : "/")}
+              onClick={() =>
+                navigate(isExistingVideo ? "/edit-videos" : "/upload")
+              }
             >
               ← Back
             </Button>
