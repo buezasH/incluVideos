@@ -70,6 +70,59 @@ export default function EditVideo() {
     setIsPlaying(!isPlaying);
   };
 
+  const seekToTime = (time: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickPercent = clickX / rect.width;
+    const newTime = clickPercent * duration;
+
+    if (editMode === "trim") {
+      // Set trim points based on click
+      if (Math.abs(newTime - trimStart) < Math.abs(newTime - trimEnd)) {
+        setTrimStart(Math.max(0, Math.min(newTime, trimEnd - 1)));
+      } else {
+        setTrimEnd(Math.min(duration, Math.max(newTime, trimStart + 1)));
+      }
+    } else if (editMode === "split") {
+      setSplitPoint(newTime);
+    } else {
+      seekToTime(newTime);
+    }
+  };
+
+  const startTrimMode = () => {
+    setEditMode("trim");
+    setTrimStart(0);
+    setTrimEnd(duration);
+  };
+
+  const startSplitMode = () => {
+    setEditMode("split");
+    setSplitPoint(currentTime);
+  };
+
+  const cancelEdit = () => {
+    setEditMode(null);
+  };
+
+  const applyEdit = () => {
+    if (editMode === "trim") {
+      alert(
+        `Trimming video from ${Math.floor(trimStart)}s to ${Math.floor(trimEnd)}s`,
+      );
+    } else if (editMode === "split") {
+      alert(`Splitting video at ${Math.floor(splitPoint)}s`);
+    }
+    setEditMode(null);
+  };
+
   const handleUploadVideo = () => {
     // Clear the upload data and navigate to success page or video library
     localStorage.removeItem("pendingVideoUpload");
