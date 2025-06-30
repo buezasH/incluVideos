@@ -234,20 +234,32 @@ export default function WatchVideo() {
 
         {/* Video Info */}
         <div className="bg-white rounded-lg p-6">
-          <h1 className="text-xl font-semibold text-gray-900 mb-4">
-            Breakfast helps you start the day with energy.
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">
+            {video.title}
           </h1>
+          <p className="text-gray-600 mb-4">{video.description}</p>
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="/placeholder.svg" alt="Sarah Connors" />
-                <AvatarFallback>SC</AvatarFallback>
+                <AvatarImage
+                  src={video.author.avatar}
+                  alt={video.author.name}
+                />
+                <AvatarFallback>
+                  {video.author.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium text-gray-900">Sarah Connors</div>
+                <div className="font-medium text-gray-900">
+                  {video.author.name}
+                </div>
                 <div className="text-sm text-gray-600">
-                  Caregiver • 42 Educational Videos
+                  {video.author.title} • {video.author.videoCount} Educational
+                  Videos
                 </div>
               </div>
             </div>
