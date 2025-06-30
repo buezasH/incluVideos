@@ -41,6 +41,8 @@ export default function VideoGallery() {
   const [userVideos, setUserVideos] = useState<UserVideo[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredVideos, setFilteredVideos] = useState<UserVideo[]>([]);
+  const [videoToRemove, setVideoToRemove] = useState<UserVideo | null>(null);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
   useEffect(() => {
     // Load user videos from localStorage
