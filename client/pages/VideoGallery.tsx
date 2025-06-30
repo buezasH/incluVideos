@@ -57,7 +57,7 @@ export default function VideoGallery() {
   }, [searchQuery, userVideos]);
 
   const handleEditVideo = (videoId: number) => {
-    navigate(`/edit/${videoId}`);
+    navigate(`/edit-videos/${videoId}`);
   };
 
   const handleUploadNew = () => {
