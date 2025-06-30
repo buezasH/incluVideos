@@ -1,62 +1,116 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { Layout } from "@/components/Layout";
+import { VideoCard } from "@/components/VideoCard";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+
+const videoSections = [
+  {
+    title: "Daily Routines",
+    videos: [
+      {
+        id: 1,
+        title: "Getting Ready for School",
+        description:
+          "Learn how to start your day with confidence - wake up, brush your teeth, and pack your bag.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=300&fit=crop",
+        duration: "3:45",
+      },
+      {
+        id: 2,
+        title: "Morning Hygiene Steps",
+        description:
+          "Learn the essential steps of brushing, washing, and staying fresh before starting your school day properly.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
+        duration: "2:30",
+      },
+      {
+        id: 3,
+        title: "Making Your Bed",
+        description:
+          "Discover how to straighten your blanket and pillows to keep your room neat every morning.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+        duration: "1:15",
+      },
+    ],
+  },
+  {
+    title: "Understanding Emotions",
+    videos: [
+      {
+        id: 4,
+        title: "Recognizing Feelings",
+        description:
+          "Explore different facial expressions and body language to understand how emotions like happy, sad and angry.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop",
+        duration: "4:20",
+      },
+      {
+        id: 5,
+        title: "Calming Techniques",
+        description:
+          "Learn easy breathing and stretching routines to stay calm when you feel anxious, upset, or stressed.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop",
+        duration: "5:10",
+      },
+      {
+        id: 6,
+        title: "Talking About Emotions",
+        description:
+          "Practice simple ways to express feelings using words, colors, or hand signals in everyday situations.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=300&fit=crop",
+        duration: "3:55",
+      },
+    ],
+  },
+];
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchDemo();
-  }, []);
+  const navigate = useNavigate();
 
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
+  const handleVideoClick = (videoId: number) => {
+    navigate(`/watch/${videoId}`);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+    <Layout>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Watch Videos</h1>
+        </div>
+
+        <div className="space-y-8">
+          {videoSections.map((section) => (
+            <div key={section.title}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-gray-900">
+                  {section.title}
+                </h2>
+                <Button variant="outline" size="sm">
+                  View all
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {section.videos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    title={video.title}
+                    description={video.description}
+                    thumbnail={video.thumbnail}
+                    duration={video.duration}
+                    onClick={() => handleVideoClick(video.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
