@@ -321,18 +321,24 @@ export default function EditVideo() {
               </div>
             </div>
 
-            {/* Split controls */}
+            {/* Edit status and controls */}
             <div className="flex items-center justify-center space-x-4">
-              <Button
-                variant="outline"
-                className="bg-gray-100 text-gray-600 border-gray-300"
-              >
-                00:30:00
-              </Button>
-              <Button className="bg-primary hover:bg-primary/90">
-                <Scissors className="h-4 w-4 mr-2" />
-                Split
-              </Button>
+              {editMode === "trim" && (
+                <div className="text-sm text-gray-600 bg-green-50 px-3 py-1 rounded">
+                  Trim: {Math.floor(trimStart)}s - {Math.floor(trimEnd)}s (
+                  {Math.floor(trimEnd - trimStart)}s duration)
+                </div>
+              )}
+              {editMode === "split" && (
+                <div className="text-sm text-gray-600 bg-red-50 px-3 py-1 rounded">
+                  Split at: {Math.floor(splitPoint)}s
+                </div>
+              )}
+              {!editMode && (
+                <div className="text-sm text-gray-600">
+                  Click timeline to seek, or use Trim/Split buttons to edit
+                </div>
+              )}
             </div>
           </div>
         </div>
