@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Upload, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const predefinedTags = [
   { label: "Safety", color: "bg-green-100 text-green-800" },
@@ -22,12 +23,19 @@ const predefinedTags = [
 ];
 
 export default function UploadVideo() {
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([
     "Safety",
     "Outdoors",
     "Routine",
   ]);
   const [visibility, setVisibility] = useState("public");
+  const [category, setCategory] = useState("life-skills");
+  const [language, setLanguage] = useState("english");
 
   const handleTagRemove = (tagToRemove: string) => {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
