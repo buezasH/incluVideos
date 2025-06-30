@@ -11,12 +11,52 @@ import {
   MoreHorizontal,
   Share,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
+
+// Sample video data - in a real app this would come from an API
+const videoData = {
+  1: {
+    title: "Breakfast helps you start the day with energy.",
+    description:
+      "Learn about healthy breakfast choices and morning routines that give you energy for the day ahead.",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    thumbnail:
+      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=450&fit=crop",
+    author: {
+      name: "Sarah Connors",
+      avatar: "/placeholder.svg",
+      title: "Caregiver",
+      videoCount: 42,
+    },
+  },
+  2: {
+    title: "Morning Hygiene Steps",
+    description:
+      "Essential steps for a healthy morning routine including brushing teeth and personal care.",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    thumbnail:
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=450&fit=crop",
+    author: {
+      name: "Sarah Connors",
+      avatar: "/placeholder.svg",
+      title: "Caregiver",
+      videoCount: 42,
+    },
+  },
+};
 
 export default function WatchVideo() {
   const { id } = useParams();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+
+  const video = videoData[id as keyof typeof videoData] || videoData[1];
 
   return (
     <Layout>
