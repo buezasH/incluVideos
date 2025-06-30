@@ -326,13 +326,19 @@ export default function EditVideo() {
             <Button
               variant={editMode === "trim" ? "default" : "outline"}
               onClick={editMode === "trim" ? cancelEdit : startTrimMode}
+              disabled={isProcessing || trimmedVideoUrl}
               className={editMode === "trim" ? "bg-primary text-white" : ""}
             >
-              {editMode === "trim" ? "Cancel Trim" : "Trim Video"}
+              {trimmedVideoUrl
+                ? "Video Trimmed"
+                : editMode === "trim"
+                  ? "Cancel Trim"
+                  : "Trim Video"}
             </Button>
             <Button
               variant={editMode === "split" ? "default" : "outline"}
               onClick={editMode === "split" ? cancelEdit : startSplitMode}
+              disabled={isProcessing || trimmedVideoUrl}
               className={editMode === "split" ? "bg-primary text-white" : ""}
             >
               {editMode === "split" ? "Cancel Split" : "Split Video"}
@@ -348,7 +354,11 @@ export default function EditVideo() {
                   : "Apply Edit"}
               </Button>
             )}
-            <Button variant="outline">Video Speed</Button>
+            {!trimmedVideoUrl && (
+              <Button variant="outline" disabled={isProcessing}>
+                Video Speed
+              </Button>
+            )}
           </div>
 
           {/* Timeline */}
