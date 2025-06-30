@@ -114,15 +114,101 @@ export default function EditVideo() {
     setEditMode(null);
   };
 
+  const trimVideo = async () => {
+    if (!videoRef.current || editMode !== "trim") return;
+
+    setIsProcessing(true);
+
+    try {
+      const video = videoRef.current;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      if (!ctx) {
+        throw new Error("Could not get canvas context");
+      }
+
+      // Set canvas dimensions to match video
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Create MediaRecorder to capture the trimmed video
+      const stream = canvas.captureStream(30); // 30 FPS
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "video/webm;codecs=vp9",
+      });
+
+      const chunks: Blob[] = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const trimmedBlob = new Blob(chunks, { type: "video/webm" });
+        const trimmedUrl = URL.createObjectURL(trimmedBlob);
+        setTrimmedVideoUrl(trimmedUrl);
+        setVideoUrl(trimmedUrl);
+        setIsProcessing(false);
+        setEditMode(null);
+
+        // Reset video to show trimmed version
+        if (videoRef.current) {
+          videoRef.current.src = trimmedUrl;
+          videoRef.current.load();
+        }
+      };
+
+      // Start recording
+      mediaRecorder.start();
+
+      // Pause the original video and seek to trim start
+      video.pause();
+      video.currentTime = trimStart;
+
+      await new Promise<void>((resolve) => {
+        video.onseeked = () => resolve();
+      });
+
+      // Function to draw frames during the trim duration
+      const drawFrame = () => {
+        if (video.currentTime >= trimEnd) {
+          mediaRecorder.stop();
+          return;
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Advance video time by a small amount (1/30 second for 30fps)
+        video.currentTime += 1 / 30;
+
+        if (video.currentTime < trimEnd) {
+          requestAnimationFrame(drawFrame);
+        } else {
+          mediaRecorder.stop();
+        }
+      };
+
+      // Start drawing frames
+      drawFrame();
+    } catch (error) {
+      console.error("Error trimming video:", error);
+      alert(
+        "Error trimming video. This feature requires a modern browser with MediaRecorder support.",
+      );
+      setIsProcessing(false);
+    }
+  };
+
   const applyEdit = () => {
     if (editMode === "trim") {
-      alert(
-        `Trimming video from ${Math.floor(trimStart)}s to ${Math.floor(trimEnd)}s`,
-      );
+      trimVideo();
     } else if (editMode === "split") {
       alert(`Splitting video at ${Math.floor(splitPoint)}s`);
+      setEditMode(null);
     }
-    setEditMode(null);
   };
 
   const handleUploadVideo = () => {
