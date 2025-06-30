@@ -76,17 +76,22 @@ export default function EditVideo() {
         {/* Video Player */}
         <div className="bg-white rounded-lg p-6 mb-6">
           <div className="relative bg-gray-900 rounded-lg overflow-hidden mb-4">
-            <img
-              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=450&fit=crop"
-              alt="Video preview"
+            <video
+              ref={videoRef}
+              src={videoUrl}
               className="w-full h-96 object-cover"
+              onTimeUpdate={(e) =>
+                setCurrentTime((e.target as HTMLVideoElement).currentTime)
+              }
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
             />
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-16 w-16 bg-white/20 hover:bg-white/30 text-white"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={togglePlayPause}
               >
                 {isPlaying ? (
                   <Pause className="h-8 w-8" />
@@ -95,18 +100,31 @@ export default function EditVideo() {
                 )}
               </Button>
             </div>
-            <div className="absolute bottom-4 left-4 right-4">
+            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
               <div className="bg-black/50 text-white text-sm px-2 py-1 rounded">
-                0:05 / 02:25
+                {Math.floor(currentTime / 60)}:
+                {Math.floor(currentTime % 60)
+                  .toString()
+                  .padStart(2, "0")}{" "}
+                /{" "}
+                {videoRef.current
+                  ? Math.floor(videoRef.current.duration / 60)
+                  : 0}
+                :
+                {videoRef.current
+                  ? Math.floor(videoRef.current.duration % 60)
+                      .toString()
+                      .padStart(2, "0")
+                  : "00"}
               </div>
-            </div>
-            <div className="absolute bottom-4 right-4 flex space-x-2">
-              <Button variant="ghost" size="icon" className="text-white">
-                <Volume2 className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-white">
-                <Maximize className="h-5 w-5" />
-              </Button>
+              <div className="flex space-x-2">
+                <Button variant="ghost" size="icon" className="text-white">
+                  <Volume2 className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-white">
+                  <Maximize className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </div>
 
