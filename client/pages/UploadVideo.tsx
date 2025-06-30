@@ -43,20 +43,20 @@ export default function UploadVideo() {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith("video/")) {
+    if (file && file.type.startsWith('video/')) {
       setUploadedFile(file);
     } else if (file) {
-      alert("Please select a video file (.mp4, .avi, .mov, .wmv)");
+      alert('Please select a video file (.mp4, .avi, .mov, .wmv)');
     }
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    if (file && file.type.startsWith("video/")) {
+    if (file && file.type.startsWith('video/')) {
       setUploadedFile(file);
     } else if (file) {
-      alert("Please drop a video file (.mp4, .avi, .mov, .wmv)");
+      alert('Please drop a video file (.mp4, .avi, .mov, .wmv)');
     }
   };
 
@@ -70,12 +70,12 @@ export default function UploadVideo() {
 
   const handleContinue = () => {
     if (!uploadedFile) {
-      alert("Please upload a video file first");
+      alert('Please upload a video file first');
       return;
     }
 
     if (!videoTitle.trim()) {
-      alert("Please enter a video title");
+      alert('Please enter a video title');
       return;
     }
 
@@ -89,39 +89,37 @@ export default function UploadVideo() {
       category,
       language,
       visibility,
-      uploadedAt: new Date().toISOString(),
+      uploadedAt: new Date().toISOString()
     };
 
-    localStorage.setItem(
-      "pendingVideoUpload",
-      JSON.stringify({
-        ...uploadData,
-        file: null, // Can't stringify File object
-        fileName: uploadedFile.name,
-        fileSize: uploadedFile.size,
-        fileType: uploadedFile.type,
-      }),
-    );
+    localStorage.setItem('pendingVideoUpload', JSON.stringify({
+      ...uploadData,
+      file: null, // Can't stringify File object
+      fileName: uploadedFile.name,
+      fileSize: uploadedFile.size,
+      fileType: uploadedFile.type
+    }));
 
     // Navigate to edit page
-    navigate("/edit");
+    navigate('/edit');
   };
 
   return (
     <Layout>
-      <div className="p-6 max-w-4xl">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-8">
-          Upload Video
-        </h1>
+      <div className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-6 lg:mb-8">
+            Upload Video
+          </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Upload Area */}
-          <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+            {/* Upload Area */}
+            <div className="xl:col-span-2">
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 uploadedFile
-                  ? "border-green-300 bg-green-50"
-                  : "border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5"
+                  ? 'border-green-300 bg-green-50'
+                  : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
               }`}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -143,8 +141,7 @@ export default function UploadVideo() {
                     Video uploaded successfully!
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
-                    {uploadedFile.name} (
-                    {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
+                    {uploadedFile.name} ({(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
                   </p>
                   <Button
                     variant="outline"
@@ -160,9 +157,8 @@ export default function UploadVideo() {
                     <Upload className="h-8 w-8 text-green-600" />
                   </div>
                   <p className="text-gray-600 mb-2">
-                    <span className="font-medium">Drag & drop</span> your video
-                    here or{" "}
-                    <span className="font-medium text-primary">click</span> to
+                    <span className="font-medium">Drag & drop</span> your video here
+                    or <span className="font-medium text-primary">click</span> to
                     upload.
                   </p>
                   <p className="text-sm text-gray-500 mb-4">
@@ -283,11 +279,7 @@ export default function UploadVideo() {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => navigate("/")}
-                >
+                <Button variant="outline" className="flex-1" onClick={() => navigate('/')}>
                   Back
                 </Button>
                 <Button
