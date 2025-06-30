@@ -295,17 +295,15 @@ export default function EditVideo() {
             </div>
             <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
               <div className="bg-black/50 text-white text-sm px-2 py-1 rounded">
-                {Math.floor(currentTime / 60)}:
-                {Math.floor(currentTime % 60)
-                  .toString()
-                  .padStart(2, "0")}{" "}
-                /{" "}
-                {videoRef.current
-                  ? Math.floor(videoRef.current.duration / 60)
-                  : 0}
-                :
-                {videoRef.current
-                  ? Math.floor(videoRef.current.duration % 60)
+                {isFinite(currentTime) ? Math.floor(currentTime / 60) : 0}:
+                {isFinite(currentTime)
+                  ? Math.floor(currentTime % 60)
+                      .toString()
+                      .padStart(2, "0")
+                  : "00"}{" "}
+                / {duration > 0 ? Math.floor(duration / 60) : 0}:
+                {duration > 0
+                  ? Math.floor(duration % 60)
                       .toString()
                       .padStart(2, "0")
                   : "00"}
