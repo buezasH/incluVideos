@@ -204,8 +204,28 @@ export default function EditVideo() {
 
           {/* Video Controls */}
           <div className="flex items-center justify-center space-x-6 mb-6">
-            <Button variant="outline">Trim Video</Button>
-            <Button variant="outline">Split Video</Button>
+            <Button
+              variant={editMode === "trim" ? "default" : "outline"}
+              onClick={editMode === "trim" ? cancelEdit : startTrimMode}
+              className={editMode === "trim" ? "bg-primary text-white" : ""}
+            >
+              {editMode === "trim" ? "Cancel Trim" : "Trim Video"}
+            </Button>
+            <Button
+              variant={editMode === "split" ? "default" : "outline"}
+              onClick={editMode === "split" ? cancelEdit : startSplitMode}
+              className={editMode === "split" ? "bg-primary text-white" : ""}
+            >
+              {editMode === "split" ? "Cancel Split" : "Split Video"}
+            </Button>
+            {editMode && (
+              <Button
+                onClick={applyEdit}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Apply Edit
+              </Button>
+            )}
             <Button variant="outline">Video Speed</Button>
           </div>
 
