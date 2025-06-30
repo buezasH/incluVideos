@@ -166,25 +166,66 @@ export default function UploadVideo() {
 
                   {uploadedFile ? (
                     <div className="space-y-4">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-green-100 rounded-lg flex items-center justify-center">
-                        <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-green-700 font-medium mb-2 text-base sm:text-lg">
-                          Video uploaded successfully!
-                        </p>
-                        <p className="text-sm sm:text-base text-gray-600 mb-4 break-all">
-                          {uploadedFile.name} (
-                          {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={handleBrowseClick}
-                        className="border-primary text-primary hover:bg-primary hover:text-white text-sm sm:text-base px-6 py-2"
-                      >
-                        Change File
-                      </Button>
+                      {isGeneratingThumbnail ? (
+                        <div className="space-y-4">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-blue-100 rounded-lg flex items-center justify-center">
+                            <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                          </div>
+                          <p className="text-blue-700 font-medium text-base sm:text-lg">
+                            Generating thumbnail...
+                          </p>
+                        </div>
+                      ) : thumbnail ? (
+                        <div className="space-y-4">
+                          <div className="mx-auto w-32 h-24 sm:w-40 sm:h-30 rounded-lg overflow-hidden border-2 border-green-300">
+                            <img
+                              src={thumbnail}
+                              alt="Video thumbnail"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-green-700 font-medium mb-2 text-base sm:text-lg">
+                              Video uploaded successfully!
+                            </p>
+                            <p className="text-sm sm:text-base text-gray-600 mb-4 break-all">
+                              {uploadedFile.name} (
+                              {(uploadedFile.size / (1024 * 1024)).toFixed(2)}{" "}
+                              MB)
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            onClick={handleBrowseClick}
+                            className="border-primary text-primary hover:bg-primary hover:text-white text-sm sm:text-base px-6 py-2"
+                          >
+                            Change File
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-green-100 rounded-lg flex items-center justify-center">
+                            <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-green-700 font-medium mb-2 text-base sm:text-lg">
+                              Video uploaded successfully!
+                            </p>
+                            <p className="text-sm sm:text-base text-gray-600 mb-4 break-all">
+                              {uploadedFile.name} (
+                              {(uploadedFile.size / (1024 * 1024)).toFixed(2)}{" "}
+                              MB)
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            onClick={handleBrowseClick}
+                            className="border-primary text-primary hover:bg-primary hover:text-white text-sm sm:text-base px-6 py-2"
+                          >
+                            Change File
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-4">
