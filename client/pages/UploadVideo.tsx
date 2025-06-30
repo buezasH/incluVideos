@@ -127,6 +127,7 @@ export default function UploadVideo() {
         fileName: uploadedFile.name,
         fileSize: uploadedFile.size,
         fileType: uploadedFile.type,
+        thumbnail: thumbnail,
       }),
     );
 
