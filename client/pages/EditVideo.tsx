@@ -233,14 +233,14 @@ export default function EditVideo() {
   const handleUploadVideo = () => {
     // Create a new video entry and clear upload data
     const videoId = Date.now(); // Simple ID generation
-    const finalVideoUrl = trimmedVideoUrl || videoUrl; // Use trimmed version if available
+    const trimMetadata = uploadData?.trimMetadata;
 
     const finalVideoData = {
       id: videoId,
       title: uploadData.title,
       description: uploadData.description,
-      videoUrl: finalVideoUrl,
-      thumbnail: finalVideoUrl, // In real app, would generate thumbnail
+      videoUrl: videoUrl,
+      thumbnail: videoUrl, // In real app, would generate thumbnail
       author: {
         name: "Current User",
         avatar: "/placeholder.svg",
@@ -248,10 +248,12 @@ export default function EditVideo() {
         videoCount: 1,
       },
       uploadedAt: new Date().toISOString(),
-      originalDuration: duration,
-      finalDuration: trimmedVideoUrl ? trimEnd - trimStart : duration,
-      wasTrimmed: !!trimmedVideoUrl,
-      trimData: trimmedVideoUrl ? { trimStart, trimEnd } : null,
+      originalDuration: trimMetadata
+        ? trimMetadata.trimEnd - trimMetadata.trimStart
+        : duration,
+      finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
+      wasTrimmed: !!trimMetadata,
+      trimData: trimMetadata || null,
     };
 
     // Store the new video (in real app, would send to server)
