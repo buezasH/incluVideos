@@ -56,7 +56,11 @@ export default function WatchVideo() {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
 
-  const video = videoData[id as keyof typeof videoData] || videoData[1];
+  // Check for user uploaded videos first
+  const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
+  const userVideo = userVideos.find((v: any) => v.id.toString() === id);
+  const video =
+    userVideo || videoData[id as keyof typeof videoData] || videoData[1];
 
   useEffect(() => {
     const videoElement = videoRef.current;
