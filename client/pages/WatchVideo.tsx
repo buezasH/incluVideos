@@ -18,6 +18,7 @@ import {
   getVideoDisplayUrl,
   getThumbnailUrl,
 } from "@/lib/videoService";
+import { getVideoMetadata } from "@/lib/videoMetadataService";
 import { runConnectivityTest } from "@/lib/r2Test";
 import { R2UrlTester } from "@/components/R2UrlTester";
 import { VideoDebugger } from "@/components/VideoDebugger";
@@ -81,7 +82,32 @@ export default function WatchVideo() {
         console.log("Network status:", navigator.onLine ? "Online" : "Offline");
         console.log("User agent:", navigator.userAgent);
 
-        // Try to load user video first
+        // Try to load video from MongoDB first
+        try {
+          const videoMetadata = await getVideoMetadata(id);
+
+          if (videoMetadata) {
+            const videoData = {
+              ...videoMetadata,
+              videoUrl: getVideoDisplayUrl(videoMetadata),
+              thumbnail: getThumbnailUrl(videoMetadata),
+              author: {
+                name: "Content Creator",
+                avatar: "/placeholder.svg",
+                title: "Caregiver",
+                videoCount: 1,
+              },
+            };
+
+            setVideo(videoData);
+            setLoading(false);
+            return;
+          }
+        } catch (mongoError) {
+          console.log("Video not found in MongoDB, trying legacy storage");
+        }
+
+        // Fallback to legacy localStorage method
         const result = await loadVideoForPlayback(id);
 
         if (result.video) {
