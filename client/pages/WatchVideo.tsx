@@ -298,6 +298,11 @@ export default function WatchVideo() {
                 Go Back
               </button>
             </div>
+
+            {/* R2 URL Debugger for failed videos */}
+            {video && video.videoUrl.includes("r2.cloudflarestorage.com") && (
+              <R2UrlTester videoUrl={video.videoUrl} />
+            )}
           </div>
         </div>
       </Layout>
