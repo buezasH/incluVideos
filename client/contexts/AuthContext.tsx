@@ -98,24 +98,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, password }),
       });
 
-      if (!response.ok) {
-        // For error responses, try to get error message but handle parsing failures
-        let errorMessage = `Login failed: ${response.status} ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error("Could not parse error response:", jsonError);
-        }
-        throw new Error(errorMessage);
-      }
-
       let data;
       try {
         data = await response.json();
       } catch (jsonError) {
         console.error("Login JSON parse error:", jsonError);
         throw new Error(`Login failed: Could not parse response`);
+      }
+
+      if (!response.ok) {
+        const errorMessage =
+          data.message ||
+          `Login failed: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       setToken(data.token);
@@ -149,24 +144,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, email, password, role }),
       });
 
-      if (!response.ok) {
-        // For error responses, try to get error message but handle parsing failures
-        let errorMessage = `Registration failed: ${response.status} ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error("Could not parse error response:", jsonError);
-        }
-        throw new Error(errorMessage);
-      }
-
       let data;
       try {
         data = await response.json();
       } catch (jsonError) {
         console.error("Registration JSON parse error:", jsonError);
         throw new Error(`Registration failed: Could not parse response`);
+      }
+
+      if (!response.ok) {
+        const errorMessage =
+          data.message ||
+          `Registration failed: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       setToken(data.token);
