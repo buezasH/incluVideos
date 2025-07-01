@@ -64,24 +64,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
 
             if (!response.ok) {
-              // Check if it's a service unavailable error (MongoDB down)
-              if (response.status === 503) {
-                console.log(
-                  "🔄 Authentication service unavailable - using demo mode",
-                );
-                // Keep stored user but mark as demo mode
-                const demoUser = {
-                  id: "demo-user",
-                  username: "DemoUser",
-                  email: "demo@example.com",
-                  role: "Caregiver" as const,
-                  createdAt: new Date().toISOString(),
-                };
-                setUser(demoUser);
-                setToken("demo-token");
-                return;
-              }
-
               // Token is invalid, clear storage
               localStorage.removeItem("auth_token");
               localStorage.removeItem("auth_user");
@@ -90,17 +72,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             console.error("Token validation error:", error);
-            // If network error, try demo mode
-            console.log("🔄 Network error - trying demo mode");
-            const demoUser = {
-              id: "demo-user",
-              username: "DemoUser",
-              email: "demo@example.com",
-              role: "Caregiver" as const,
-              createdAt: new Date().toISOString(),
-            };
-            setUser(demoUser);
-            setToken("demo-token");
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("auth_user");
+            setToken(null);
+            setUser(null);
           }
         }
       } catch (error) {
