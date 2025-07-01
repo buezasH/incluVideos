@@ -200,114 +200,23 @@ export default function EditVideo() {
     setIsProcessing(true);
 
     try {
-      const video = videoRef.current;
       const trimmedDuration = trimEnd - trimStart;
 
-      // Create actual trimmed video using MediaRecorder and Canvas
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas context not available");
+      // Simple trim implementation: store trim points and duration
+      // The actual video trimming will happen during upload
+      setTrimmedVideoUrl(videoUrl); // Keep original URL for preview
 
-      // Set canvas size to match video
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 360;
-
-      // Create MediaRecorder to capture the trimmed video
-      const stream = canvas.captureStream(30); // 30 FPS
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
-      });
-
-      const chunks: BlobPart[] = [];
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      // Start recording
-      mediaRecorder.start(100); // Capture every 100ms
-
-      // Create a temporary video element for frame extraction
-      const sourceVideo = document.createElement("video");
-      sourceVideo.src = videoUrl;
-      sourceVideo.crossOrigin = "anonymous";
-      sourceVideo.muted = true;
-
-      await new Promise<void>((resolve, reject) => {
-        sourceVideo.onloadedmetadata = async () => {
-          try {
-            sourceVideo.currentTime = trimStart;
-
-            // Wait for first frame to be ready
-            await new Promise<void>((frameResolve) => {
-              sourceVideo.onseeked = () => frameResolve();
-            });
-
-            // Render frames from trimStart to trimEnd
-            const frameRate = 30;
-            const frameDuration = 1 / frameRate;
-            let currentFrameTime = 0;
-
-            const renderFrame = async () => {
-              if (currentFrameTime >= trimmedDuration) {
-                mediaRecorder.stop();
-                resolve();
-                return;
-              }
-
-              const videoTime = trimStart + currentFrameTime;
-              sourceVideo.currentTime = videoTime;
-
-              await new Promise<void>((seekResolve) => {
-                sourceVideo.onseeked = () => {
-                  // Draw frame to canvas
-                  ctx.drawImage(sourceVideo, 0, 0, canvas.width, canvas.height);
-                  seekResolve();
-                };
-              });
-
-              currentFrameTime += frameDuration;
-
-              // Use requestAnimationFrame for smooth rendering
-              requestAnimationFrame(renderFrame);
-            };
-
-            renderFrame();
-          } catch (error) {
-            reject(error);
-          }
-        };
-
-        sourceVideo.onerror = () =>
-          reject(new Error("Failed to load source video"));
-        sourceVideo.load();
-      });
-
-      // Wait for recording to finish and create blob
-      const trimmedBlob = await new Promise<Blob>((resolve) => {
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(chunks, { type: "video/webm" });
-          resolve(blob);
-        };
-      });
-
-      // Create object URL for immediate playback
-      const trimmedVideoUrl = URL.createObjectURL(trimmedBlob);
-      setTrimmedVideoUrl(trimmedVideoUrl);
-      setVideoUrl(trimmedVideoUrl);
-
-      // Update duration and reset playback
+      // Update UI to show trimmed duration
       setDuration(trimmedDuration);
       setCurrentTime(0);
 
-      // Store trim metadata and the trimmed blob for upload
+      // Store trim metadata for upload processing
       const trimMetadata = {
         originalUrl: videoUrl,
         trimStart,
         trimEnd,
         trimmedDuration,
-        trimmedBlob, // Store the actual trimmed video blob
+        needsServerProcessing: true, // Flag for server-side trimming
       };
 
       setUploadData((prev) => ({
@@ -318,17 +227,17 @@ export default function EditVideo() {
       setIsProcessing(false);
       setEditMode(null);
 
-      // Reset video to start of trimmed content
+      // Reset video to trimmed start point for preview
       if (videoRef.current) {
-        videoRef.current.currentTime = 0;
+        videoRef.current.currentTime = trimStart;
       }
 
       console.log(
-        `✅ Video trimmed successfully: ${trimmedDuration}s duration`,
+        `✅ Video trim points set: ${trimStart}s to ${trimEnd}s (${trimmedDuration}s duration)`,
       );
     } catch (error) {
-      console.error("Error trimming video:", error);
-      alert("Error trimming video. Please try again.");
+      console.error("Error setting trim points:", error);
+      alert("Error setting trim points. Please try again.");
       setIsProcessing(false);
     }
   };
