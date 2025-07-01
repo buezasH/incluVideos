@@ -13,6 +13,11 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import {
+  loadVideoForPlayback,
+  getVideoDisplayUrl,
+  getThumbnailUrl,
+} from "@/lib/videoService";
 
 // Sample video data - in a real app this would come from an API
 const videoData = {
