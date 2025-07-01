@@ -253,11 +253,19 @@ export default function WatchVideo() {
           <div className="relative bg-gray-900 aspect-video group">
             <video
               ref={videoRef}
-              src={video.videoUrl}
-              poster={video.thumbnail}
+              src={video?.videoUrl}
+              poster={video?.thumbnail}
               className="w-full h-full object-cover"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
+              crossOrigin="anonymous"
+              preload="metadata"
+              onError={(e) => {
+                console.error("Video load error:", e);
+                setError("Failed to load video");
+              }}
+              onLoadStart={() => console.log("Video loading started")}
+              onCanPlay={() => console.log("Video can play")}
             />
 
             {/* Central Play Button */}
