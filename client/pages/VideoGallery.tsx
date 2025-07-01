@@ -83,29 +83,41 @@ export default function VideoGallery() {
     setShowRemoveDialog(true);
   };
 
-  const confirmRemoveVideo = () => {
+  const confirmRemoveVideo = async () => {
     if (!videoToRemove) return;
 
-    // Remove from localStorage
-    const updatedVideos = userVideos.filter(
-      (video) => video.id !== videoToRemove.id,
-    );
-    localStorage.setItem("userVideos", JSON.stringify(updatedVideos));
+    try {
+      // Delete from R2 storage if the video has R2 keys
+      if (videoToRemove.r2VideoKey || videoToRemove.r2ThumbnailKey) {
+        // Extract file extension from video URL or use default
+        const fileExtension = videoToRemove.videoUrl.split(".").pop() || "mp4";
+        await deleteVideoFromR2(videoToRemove.id.toString(), fileExtension);
+      }
 
-    // Update state
-    setUserVideos(updatedVideos);
-    setFilteredVideos(
-      updatedVideos.filter(
-        (video) =>
-          searchQuery.trim() === "" ||
-          video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          video.description.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-    );
+      // Remove from localStorage
+      const updatedVideos = userVideos.filter(
+        (video) => video.id !== videoToRemove.id,
+      );
+      localStorage.setItem("userVideos", JSON.stringify(updatedVideos));
 
-    // Close dialog
-    setShowRemoveDialog(false);
-    setVideoToRemove(null);
+      // Update state
+      setUserVideos(updatedVideos);
+      setFilteredVideos(
+        updatedVideos.filter(
+          (video) =>
+            searchQuery.trim() === "" ||
+            video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            video.description.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+      );
+
+      // Close dialog
+      setShowRemoveDialog(false);
+      setVideoToRemove(null);
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      alert("Failed to delete video. Please try again.");
+    }
   };
 
   const cancelRemoveVideo = () => {
