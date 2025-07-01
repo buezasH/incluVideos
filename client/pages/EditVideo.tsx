@@ -53,28 +53,35 @@ export default function EditVideo() {
       window.location.pathname.startsWith("/edit-videos/");
 
     if (id && isEditVideosRoute) {
-      // Editing existing video from gallery
-      const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
-      const existingVideo = userVideos.find((v: any) => v.id.toString() === id);
+      // Editing existing video from gallery - load from MongoDB
+      const loadExistingVideo = async () => {
+        try {
+          const existingVideo = await getVideoMetadata(id);
 
-      if (existingVideo) {
-        setIsExistingVideo(true);
-        setUploadData({
-          title: existingVideo.title,
-          description: existingVideo.description,
-          fileUrl: existingVideo.videoUrl,
-          trimMetadata: existingVideo.trimData,
-        });
-        setVideoUrl(existingVideo.videoUrl);
+          setIsExistingVideo(true);
+          setUploadData({
+            title: existingVideo.title,
+            description: existingVideo.description,
+            category: existingVideo.category,
+            tags: existingVideo.tags,
+            fileUrl: existingVideo.videoUrl,
+            trimMetadata: existingVideo.trimData,
+            isPublic: existingVideo.isPublic,
+          });
+          setVideoUrl(existingVideo.videoUrl);
 
-        // If the video was previously trimmed, set up the trim data
-        if (existingVideo.trimData) {
-          setTrimmedVideoUrl(existingVideo.videoUrl);
+          // If the video was previously trimmed, set up the trim data
+          if (existingVideo.trimData) {
+            setTrimmedVideoUrl(existingVideo.videoUrl);
+          }
+        } catch (error) {
+          console.error("Error loading video:", error);
+          // Video not found or error, redirect to gallery
+          navigate("/edit-videos");
         }
-      } else {
-        // Video not found, redirect to gallery
-        navigate("/edit-videos");
-      }
+      };
+
+      loadExistingVideo();
     } else {
       // New upload from upload page (/edit route)
       const storedData = localStorage.getItem("pendingVideoUpload");
@@ -286,9 +293,10 @@ export default function EditVideo() {
         // Update metadata in MongoDB
         const updatedVideo = await updateVideoMetadata(id, updateData);
 
-        console.log(`✅ Video updated in MongoDB: ${updatedVideo.title} (${id})`);
+        console.log(
+          `✅ Video updated in MongoDB: ${updatedVideo.title} (${id})`,
+        );
         navigate(`/watch/${id}`);
-      }
       } else {
         // Upload new video to R2
         const videoId = uploadData.videoId || generateVideoId();
@@ -334,7 +342,9 @@ export default function EditVideo() {
           videoUrl: videoUploadResult.url,
           thumbnailUrl: thumbnailUrl || undefined,
           r2VideoKey: videoUploadResult.key,
-          r2ThumbnailKey: thumbnailUrl ? `thumbnails/${videoId}.jpg` : undefined,
+          r2ThumbnailKey: thumbnailUrl
+            ? `thumbnails/${videoId}.jpg`
+            : undefined,
           duration: duration,
           originalDuration: duration,
           finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
@@ -346,7 +356,8 @@ export default function EditVideo() {
                 trimmedDuration: trimMetadata.trimmedDuration,
               }
             : undefined,
-          isPublic: uploadData.isPublic !== undefined ? uploadData.isPublic : true,
+          isPublic:
+            uploadData.isPublic !== undefined ? uploadData.isPublic : true,
           accessibilityFeatures: {
             hasSubtitles: false,
             hasAudioDescription: false,
@@ -360,7 +371,9 @@ export default function EditVideo() {
         // Clear upload data for new videos
         localStorage.removeItem("pendingVideoUpload");
 
-        console.log(`✅ Video saved to MongoDB: ${savedVideo.title} (${savedVideo.id})`);
+        console.log(
+          `✅ Video saved to MongoDB: ${savedVideo.title} (${savedVideo.id})`,
+        );
         navigate(`/watch/${savedVideo.id}`);
       }
     } catch (error) {
