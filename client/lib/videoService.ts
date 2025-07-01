@@ -37,14 +37,13 @@ export const getVideoById = (id: string): VideoData | null => {
 };
 
 /**
- * Loads and validates a video for playback
+ * Loads a video for playback (simplified to avoid CORS issues)
  */
 export const loadVideoForPlayback = async (
   id: string,
 ): Promise<{
   video: VideoData | null;
   error?: string;
-  accessible?: boolean;
 }> => {
   try {
     // Get video from localStorage
@@ -53,19 +52,8 @@ export const loadVideoForPlayback = async (
       return { video: null, error: "Video not found" };
     }
 
-    // Check if video URL is accessible
-    const { videoAccessible } = await validateVideoUrls(video);
-
-    if (!videoAccessible) {
-      console.warn(`Video ${id} URL not accessible:`, video.videoUrl);
-      return {
-        video,
-        accessible: false,
-        error: "Video file not accessible. It may have been moved or deleted.",
-      };
-    }
-
-    return { video, accessible: true };
+    // Return video data - let the video element handle loading/errors
+    return { video };
   } catch (error) {
     console.error("Error loading video:", error);
     return { video: null, error: "Failed to load video" };
