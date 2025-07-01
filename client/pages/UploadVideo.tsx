@@ -117,7 +117,7 @@ export default function UploadVideo() {
       tags: selectedTags,
       category,
       language,
-      visibility,
+      isPublic: visibility === "public",
       thumbnail: thumbnail,
       uploadedAt: new Date().toISOString(),
     };
