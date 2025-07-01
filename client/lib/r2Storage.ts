@@ -190,7 +190,7 @@ export const uploadThumbnailToR2 = async (
   videoId: string,
 ): Promise<UploadResult> => {
   const key = `thumbnails/${videoId}.jpg`;
-  return uploadToR2(thumbnailBlob, key);
+  return uploadToR2(thumbnailBlob, key, videoId, "thumbnail");
 };
 
 /**
