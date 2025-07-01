@@ -98,7 +98,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // If response body is not valid JSON, throw a generic error
+        throw new Error(
+          `Login failed: ${response.status} ${response.statusText}`,
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
@@ -135,7 +143,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, email, password, role }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // If response body is not valid JSON, throw a generic error
+        throw new Error(
+          `Registration failed: ${response.status} ${response.statusText}`,
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Registration failed");
