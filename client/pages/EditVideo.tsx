@@ -269,8 +269,8 @@ export default function EditVideo() {
           let newVideoUrl = userVideos[videoIndex].videoUrl;
           let newThumbnailUrl = userVideos[videoIndex].thumbnail;
 
-          // If video was trimmed, upload the new trimmed version
-          if (trimMetadata && trimMetadata.trimmedBlob) {
+          // If video was trimmed, we'll save the trim metadata for playback control
+          if (trimMetadata && trimMetadata.needsServerProcessing) {
             setUploadProgress("Uploading edited video to cloud storage...");
 
             // Create a file from the trimmed blob
