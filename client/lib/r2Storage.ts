@@ -113,33 +113,42 @@ const videoStorage = new VideoStorage();
  * Uploads a file with R2 fallback to IndexedDB
  * @param file - File to upload
  * @param key - Storage key/path for the file
+ * @param videoId - Video ID for the upload
+ * @param type - Type of upload (video or thumbnail)
  * @returns Promise with upload result
  */
 export const uploadToR2 = async (
   file: File | Blob,
   key: string,
+  videoId?: string,
+  type: "video" | "thumbnail" = "video",
 ): Promise<UploadResult> => {
   try {
-    // Try R2 upload first
-    const response = await fetch(`${R2_ENDPOINT}/${key}`, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type || "application/octet-stream",
-      },
+    // Try secure backend upload first
+    const formData = new FormData();
+    formData.append("video", file);
+    if (videoId) {
+      formData.append("videoId", videoId);
+    }
+    formData.append("type", type);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
     });
 
     if (response.ok) {
-      const url = `${R2_ENDPOINT}/${key}`;
+      const result = await response.json();
       setStorageMethod("r2");
-      return { url, key };
+      return { url: result.url, key: result.key };
     } else {
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        `R2 upload failed: ${response.status} ${response.statusText}`,
+        `Server upload failed: ${response.status} ${errorData.message || response.statusText}`,
       );
     }
   } catch (error) {
-    console.warn("R2 upload failed, using local storage:", error);
+    console.warn("Server upload failed, using local storage:", error);
 
     // Fallback to IndexedDB
     try {
@@ -149,7 +158,7 @@ export const uploadToR2 = async (
     } catch (fallbackError) {
       console.error("Fallback storage also failed:", fallbackError);
       throw new Error(
-        `Both R2 and local storage failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Both server and local storage failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
