@@ -45,12 +45,14 @@ export const uploadVideo: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Video ID required" });
     }
 
-    // Determine file extension
-    const fileExtension = file.mimetype.split("/")[1] || "mp4";
-    const key =
-      type === "thumbnail"
-        ? `thumbnails/${videoId}.jpg`
-        : `videos/${videoId}.${fileExtension}`;
+    // Determine file extension and key based on type
+    let key: string;
+    if (type === "thumbnail") {
+      key = `thumbnails/${videoId}.jpg`;
+    } else {
+      const fileExtension = file.mimetype.split("/")[1] || "mp4";
+      key = `videos/${videoId}.${fileExtension}`;
+    }
 
     // Upload to R2 using AWS SDK v3
     const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
