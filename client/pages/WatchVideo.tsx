@@ -77,6 +77,9 @@ export default function WatchVideo() {
         const result = await loadVideoForPlayback(id);
 
         if (result.video) {
+          console.log("Loaded video:", result.video.title);
+          console.log("Video URL:", result.video.videoUrl);
+          console.log("Thumbnail URL:", result.video.thumbnail);
           setVideo(result.video);
           setLoading(false);
           return;
