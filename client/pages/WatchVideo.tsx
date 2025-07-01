@@ -326,9 +326,21 @@ export default function WatchVideo() {
                   setError("Unknown video loading error");
                 }
               }}
-              onLoadStart={() => console.log("Video loading started")}
+              onLoadStart={() => {
+                console.log("Video loading started");
+                console.log(
+                  "Video source:",
+                  video ? getVideoDisplayUrl(video) : "no video",
+                );
+              }}
               onCanPlay={() => console.log("Video can play")}
               onLoadedData={() => console.log("Video data loaded")}
+              onLoadedMetadata={() => console.log("Video metadata loaded")}
+              onWaiting={() => console.log("Video buffering")}
+              onStalled={() => console.log("Video stalled")}
+              onSuspend={() => console.log("Video loading suspended")}
+              onAbort={() => console.log("Video loading aborted")}
+              onEmptied={() => console.log("Video emptied")}
             />
 
             {/* Central Play Button */}
