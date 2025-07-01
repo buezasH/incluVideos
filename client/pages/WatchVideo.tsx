@@ -97,7 +97,7 @@ export default function WatchVideo() {
 
             if (videoMetadata.userId) {
               try {
-                const token = localStorage.getItem("token");
+                const token = localStorage.getItem("auth_token");
                 const userId =
                   typeof videoMetadata.userId === "string"
                     ? videoMetadata.userId
