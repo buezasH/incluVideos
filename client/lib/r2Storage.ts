@@ -149,8 +149,16 @@ export const uploadToR2 = async (
     }
     formData.append("type", type);
 
+    // Get auth token
+    const token = localStorage.getItem("auth_token");
+    const headers: HeadersInit = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch("/api/upload", {
       method: "POST",
+      headers,
       body: formData,
     });
 
@@ -236,8 +244,15 @@ export const uploadThumbnailDataUrlToR2 = async (
 export const deleteFromR2 = async (key: string): Promise<void> => {
   try {
     // Try backend delete first
+    const token = localStorage.getItem("auth_token");
+    const headers: HeadersInit = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(`/api/upload/${encodeURIComponent(key)}`, {
       method: "DELETE",
+      headers,
     });
 
     if (response.ok || response.status === 404) {
