@@ -337,6 +337,25 @@ export default function UploadVideo() {
                             <SelectItem value="entertainment">
                               Entertainment
                             </SelectItem>
+                            <SelectItem value="health-safety">
+                              Health & Safety
+                            </SelectItem>
+                            <SelectItem value="social-skills">
+                              Social Skills
+                            </SelectItem>
+                            <SelectItem value="communication">
+                              Communication
+                            </SelectItem>
+                            <SelectItem value="work-skills">
+                              Work Skills
+                            </SelectItem>
+                            <SelectItem value="recreation">
+                              Recreation
+                            </SelectItem>
+                            <SelectItem value="daily-living">
+                              Daily Living
+                            </SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

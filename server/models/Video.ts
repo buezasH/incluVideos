@@ -50,16 +50,17 @@ const videoSchema = new mongoose.Schema(
       type: String,
       enum: [
         "life-skills",
+        "education",
+        "entertainment",
         "health-safety",
         "social-skills",
         "communication",
         "work-skills",
         "recreation",
-        "education",
         "daily-living",
         "other",
       ],
-      default: "other",
+      default: "life-skills",
     },
     tags: [
       {
