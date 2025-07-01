@@ -18,6 +18,7 @@ import {
   getVideoDisplayUrl,
   getThumbnailUrl,
 } from "@/lib/videoService";
+import { runConnectivityTest } from "@/lib/r2Test";
 
 // Sample video data - in a real app this would come from an API
 const videoData = {
