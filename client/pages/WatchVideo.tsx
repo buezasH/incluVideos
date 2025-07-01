@@ -20,6 +20,7 @@ import {
 } from "@/lib/videoService";
 import { runConnectivityTest } from "@/lib/r2Test";
 import { R2UrlTester } from "@/components/R2UrlTester";
+import { VideoDebugger } from "@/components/VideoDebugger";
 
 // Sample video data - in a real app this would come from an API
 const videoData = {
