@@ -16,6 +16,7 @@ import { Upload, X } from "lucide-react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateVideoThumbnailWithSize } from "@/lib/videoUtils";
+import { generateVideoId } from "@/lib/r2Storage";
 
 const predefinedTags = [
   { label: "Safety", color: "bg-green-100 text-green-800" },
