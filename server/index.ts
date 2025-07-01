@@ -7,6 +7,13 @@ import { getVideo, listVideos, checkVideoExists } from "./routes/videos";
 import { testR2Structure } from "./routes/r2-test";
 import { register, login, getProfile, logout } from "./routes/auth";
 import {
+  createVideo,
+  getVideo,
+  getVideos,
+  updateVideo,
+  deleteVideo,
+} from "./routes/videoMetadata";
+import {
   authenticateToken,
   requireCaregiver,
   optionalAuth,
@@ -50,6 +57,18 @@ export function createServer() {
   app.get("/api/auth/profile", authenticateToken, getProfile);
   app.post("/api/auth/logout", logout);
 
+  // Video metadata routes
+  app.post("/api/videos", authenticateToken, requireCaregiver, createVideo);
+  app.get("/api/videos", optionalAuth, getVideos);
+  app.get("/api/videos/:id", optionalAuth, getVideo);
+  app.put("/api/videos/:id", authenticateToken, requireCaregiver, updateVideo);
+  app.delete(
+    "/api/videos/:id",
+    authenticateToken,
+    requireCaregiver,
+    deleteVideo,
+  );
+
   // Protected upload routes (require Caregiver role)
   app.post(
     "/api/upload",
@@ -65,9 +84,7 @@ export function createServer() {
     deleteVideo,
   );
 
-  // Video routes (public or optional auth)
-  app.get("/api/videos/:id", optionalAuth, getVideo);
-  app.get("/api/videos", optionalAuth, listVideos);
+  // Legacy video routes (kept for compatibility)
   app.get("/api/videos/check/:key", optionalAuth, checkVideoExists);
 
   // R2 debug routes (protected)

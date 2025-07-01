@@ -1,0 +1,276 @@
+/**
+ * Video Metadata Service
+ * Handles video metadata operations with MongoDB backend
+ */
+
+export interface VideoMetadata {
+  id: string;
+  title: string;
+  description: string;
+  category?: string;
+  tags: string[];
+  videoUrl: string;
+  thumbnailUrl?: string;
+  r2VideoKey: string;
+  r2ThumbnailKey?: string;
+  userId: string;
+  duration: number;
+  originalDuration: number;
+  finalDuration: number;
+  wasTrimmed: boolean;
+  trimData?: {
+    trimStart: number;
+    trimEnd: number;
+    trimmedDuration: number;
+  };
+  uploadedAt: string;
+  lastEditedAt?: string;
+  views: number;
+  isPublic: boolean;
+  accessibilityFeatures: {
+    hasSubtitles: boolean;
+    hasAudioDescription: boolean;
+    hasSignLanguage: boolean;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateVideoData {
+  title: string;
+  description: string;
+  category?: string;
+  tags?: string[];
+  videoUrl: string;
+  thumbnailUrl?: string;
+  r2VideoKey: string;
+  r2ThumbnailKey?: string;
+  duration: number;
+  originalDuration?: number;
+  finalDuration?: number;
+  wasTrimmed?: boolean;
+  trimData?: {
+    trimStart: number;
+    trimEnd: number;
+    trimmedDuration: number;
+  };
+  isPublic?: boolean;
+  accessibilityFeatures?: {
+    hasSubtitles: boolean;
+    hasAudioDescription: boolean;
+    hasSignLanguage: boolean;
+  };
+}
+
+export interface UpdateVideoData extends Partial<CreateVideoData> {}
+
+export interface VideoListResponse {
+  success: boolean;
+  videos: VideoMetadata[];
+  pagination: {
+    current: number;
+    total: number;
+    count: number;
+    totalVideos: number;
+  };
+}
+
+// Get authentication token from localStorage
+const getAuthToken = (): string | null => {
+  return localStorage.getItem("auth_token");
+};
+
+// Get authentication headers
+const getAuthHeaders = (): HeadersInit => {
+  const token = getAuthToken();
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+/**
+ * Create new video metadata
+ */
+export const createVideoMetadata = async (
+  videoData: CreateVideoData,
+): Promise<VideoMetadata> => {
+  try {
+    const response = await fetch("/api/videos", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(videoData),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Failed to create video: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.video;
+  } catch (error) {
+    console.error("Create video metadata error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get video metadata by ID
+ */
+export const getVideoMetadata = async (id: string): Promise<VideoMetadata> => {
+  try {
+    const response = await fetch(`/api/videos/${id}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Failed to get video: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.video;
+  } catch (error) {
+    console.error("Get video metadata error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get list of videos with filtering and pagination
+ */
+export const getVideos = async (params?: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  tags?: string[];
+  userId?: string;
+  search?: string;
+  myVideos?: boolean;
+}): Promise<VideoListResponse> => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    if (params?.page) searchParams.append("page", params.page.toString());
+    if (params?.limit) searchParams.append("limit", params.limit.toString());
+    if (params?.category) searchParams.append("category", params.category);
+    if (params?.tags)
+      params.tags.forEach((tag) => searchParams.append("tags", tag));
+    if (params?.userId) searchParams.append("userId", params.userId);
+    if (params?.search) searchParams.append("search", params.search);
+    if (params?.myVideos) searchParams.append("myVideos", "true");
+
+    const response = await fetch(`/api/videos?${searchParams.toString()}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Failed to get videos: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get videos error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update video metadata
+ */
+export const updateVideoMetadata = async (
+  id: string,
+  updateData: UpdateVideoData,
+): Promise<VideoMetadata> => {
+  try {
+    const response = await fetch(`/api/videos/${id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Failed to update video: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.video;
+  } catch (error) {
+    console.error("Update video metadata error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete video metadata
+ */
+export const deleteVideoMetadata = async (
+  id: string,
+): Promise<{ r2VideoKey: string; r2ThumbnailKey?: string }> => {
+  try {
+    const response = await fetch(`/api/videos/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Failed to delete video: ${response.status} ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.deletedVideo;
+  } catch (error) {
+    console.error("Delete video metadata error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get user's videos (convenience function)
+ */
+export const getUserVideos = async (
+  page = 1,
+  limit = 10,
+): Promise<VideoListResponse> => {
+  return getVideos({ page, limit, myVideos: true });
+};
+
+/**
+ * Search videos (convenience function)
+ */
+export const searchVideos = async (
+  query: string,
+  page = 1,
+  limit = 10,
+): Promise<VideoListResponse> => {
+  return getVideos({ page, limit, search: query });
+};
