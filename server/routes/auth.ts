@@ -16,8 +16,12 @@ const generateToken = (userId: string): string => {
  */
 export const register: RequestHandler = async (req, res) => {
   try {
+    console.log("📝 Registration request received");
+    console.log("Request body:", { ...req.body, password: "[REDACTED]" });
+
     // Check if MongoDB is connected
     if (require("mongoose").connection.readyState !== 1) {
+      console.log("❌ MongoDB not connected - returning 503");
       return res.status(503).json({
         error: "Database unavailable",
         message:
@@ -86,10 +90,16 @@ export const register: RequestHandler = async (req, res) => {
 
     console.log(`✅ New user registered: ${username} (${role})`);
   } catch (error: any) {
-    console.error("Registration error:", error);
+    console.error("❌ Registration error:", error);
+    console.error("Error details:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack?.split("\n").slice(0, 5).join("\n"),
+    });
 
     // Ensure response hasn't been sent already
     if (res.headersSent) {
+      console.log("⚠️ Response already sent, skipping error response");
       return;
     }
 
@@ -98,15 +108,19 @@ export const register: RequestHandler = async (req, res) => {
       const messages = Object.values(error.errors).map(
         (err: any) => err.message,
       );
+      console.log("📝 Validation error:", messages);
       return res.status(400).json({
         error: "Validation error",
         message: messages.join(", "),
       });
     }
 
+    console.log("📝 Sending 500 error response");
     return res.status(500).json({
       error: "Server error",
       message: "An error occurred during registration",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
