@@ -318,21 +318,11 @@ export default function EditVideo() {
 
         setUploadProgress("Uploading video to cloud storage...");
 
-        // Upload video to R2 (use trimmed version if available)
-        let videoFile: File;
-        if (trimMetadata && trimMetadata.trimmedBlob) {
-          // Use the trimmed video blob
-          const fileName = pendingUpload.fileName.replace(/\.[^/.]+$/, ".webm"); // Change extension to webm for trimmed videos
-          videoFile = new File([trimMetadata.trimmedBlob], fileName, {
-            type: "video/webm",
-          });
-        } else {
-          // Use original video
-          const videoBlob = await fetch(videoUrl).then((res) => res.blob());
-          videoFile = new File([videoBlob], pendingUpload.fileName, {
-            type: pendingUpload.fileType,
-          });
-        }
+        // Upload original video to R2 (trim info saved in metadata)
+        const videoBlob = await fetch(videoUrl).then((res) => res.blob());
+        const videoFile = new File([videoBlob], pendingUpload.fileName, {
+          type: pendingUpload.fileType,
+        });
 
         const videoUploadResult = await uploadVideoToR2(videoFile, videoId);
 
