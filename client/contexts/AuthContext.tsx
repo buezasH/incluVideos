@@ -148,9 +148,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       let data;
       try {
-        data = await response.json();
+        // Clone response to avoid "body stream already read" errors
+        const responseClone = response.clone();
+        data = await responseClone.json();
       } catch (jsonError) {
         // If response body is not valid JSON, throw a generic error
+        console.error("Registration JSON parse error:", jsonError);
         throw new Error(
           `Registration failed: ${response.status} ${response.statusText}`,
         );
