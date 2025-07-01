@@ -5,7 +5,10 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import UploadVideo from "./pages/UploadVideo";
 import EditVideo from "./pages/EditVideo";
@@ -19,23 +22,89 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/upload" element={<UploadVideo />} />
-        <Route path="/edit" element={<EditVideo />} />
-        <Route path="/edit-videos" element={<VideoGallery />} />
-        <Route path="/edit-videos/:id" element={<EditVideo />} />
-        <Route path="/watch/:id" element={<WatchVideo />} />
-        <Route path="/lists" element={<MyLists />} />
-        <Route path="/recommendations" element={<Recommendations />} />
-        <Route path="/settings" element={<Settings />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute requireCaregiver>
+                <UploadVideo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit"
+            element={
+              <ProtectedRoute requireCaregiver>
+                <EditVideo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-videos"
+            element={
+              <ProtectedRoute requireCaregiver>
+                <VideoGallery />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-videos/:id"
+            element={
+              <ProtectedRoute requireCaregiver>
+                <EditVideo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/watch/:id"
+            element={
+              <ProtectedRoute>
+                <WatchVideo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lists"
+            element={
+              <ProtectedRoute>
+                <MyLists />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute>
+                <Recommendations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
