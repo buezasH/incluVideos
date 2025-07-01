@@ -76,6 +76,7 @@ export const uploadVideo: RequestHandler = async (req, res) => {
 
     await s3Client.send(uploadCommand);
 
+    // R2 public URL format: https://endpoint/bucket/key
     const publicUrl = `${R2_CONFIG.endpoint}/${R2_CONFIG.bucket}/${key}`;
 
     res.json({
@@ -85,6 +86,11 @@ export const uploadVideo: RequestHandler = async (req, res) => {
       size: file.size,
       type: file.mimetype,
     });
+
+    console.log(`✅ Video uploaded successfully:`);
+    console.log(`   Key: ${key}`);
+    console.log(`   Public URL: ${publicUrl}`);
+    console.log(`   Size: ${file.size} bytes`);
   } catch (error) {
     console.error("R2 Upload Error:", error);
     res.status(500).json({
