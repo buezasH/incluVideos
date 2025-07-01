@@ -3,6 +3,8 @@
  * Handles video and thumbnail storage with R2 fallback to IndexedDB
  */
 
+import { setStorageMethod } from "./storageStatus";
+
 const R2_ENDPOINT =
   "https://dee356186b2b200c89bcad92b58cdbb4.r2.cloudflarestorage.com/incluvid";
 
