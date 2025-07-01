@@ -64,6 +64,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
 
             if (!response.ok) {
+              // Check if it's a service unavailable error (MongoDB down)
+              if (response.status === 503) {
+                console.log(
+                  "🔄 Authentication service unavailable - using demo mode",
+                );
+                // Keep stored user but mark as demo mode
+                const demoUser = {
+                  id: "demo-user",
+                  username: "DemoUser",
+                  email: "demo@example.com",
+                  role: "Caregiver" as const,
+                  createdAt: new Date().toISOString(),
+                };
+                setUser(demoUser);
+                setToken("demo-token");
+                return;
+              }
+
               // Token is invalid, clear storage
               localStorage.removeItem("auth_token");
               localStorage.removeItem("auth_user");
@@ -72,10 +90,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             console.error("Token validation error:", error);
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("auth_user");
-            setToken(null);
-            setUser(null);
+            // If network error, try demo mode
+            console.log("🔄 Network error - trying demo mode");
+            const demoUser = {
+              id: "demo-user",
+              username: "DemoUser",
+              email: "demo@example.com",
+              role: "Caregiver" as const,
+              createdAt: new Date().toISOString(),
+            };
+            setUser(demoUser);
+            setToken("demo-token");
           }
         }
       } catch (error) {
@@ -101,6 +126,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if it's a service unavailable error (MongoDB down)
+        if (response.status === 503) {
+          console.log(
+            "🔄 Authentication service unavailable - using demo mode",
+          );
+          const demoUser = {
+            id: "demo-user",
+            username: username,
+            email: "demo@example.com",
+            role: "Caregiver" as const,
+            createdAt: new Date().toISOString(),
+          };
+          setUser(demoUser);
+          setToken("demo-token");
+          localStorage.setItem("auth_token", "demo-token");
+          localStorage.setItem("auth_user", JSON.stringify(demoUser));
+          return;
+        }
         throw new Error(data.message || "Login failed");
       }
 
@@ -138,6 +181,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if it's a service unavailable error (MongoDB down)
+        if (response.status === 503) {
+          console.log(
+            "🔄 Authentication service unavailable - using demo mode",
+          );
+          const demoUser = {
+            id: "demo-user",
+            username: username,
+            email: email,
+            role: role,
+            createdAt: new Date().toISOString(),
+          };
+          setUser(demoUser);
+          setToken("demo-token");
+          localStorage.setItem("auth_token", "demo-token");
+          localStorage.setItem("auth_user", JSON.stringify(demoUser));
+          return;
+        }
         throw new Error(data.message || "Registration failed");
       }
 

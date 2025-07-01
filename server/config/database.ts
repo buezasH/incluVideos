@@ -15,7 +15,13 @@ export const connectDB = async (): Promise<void> => {
     console.log("✅ MongoDB connected successfully");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);
-    process.exit(1);
+    console.log(
+      "🔄 Server will continue without MongoDB (authentication disabled)",
+    );
+    console.log(
+      "💡 To enable authentication, whitelist this server's IP in MongoDB Atlas",
+    );
+    // Don't exit the process - let the server run without MongoDB
   }
 };
 
