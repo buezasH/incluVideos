@@ -16,6 +16,7 @@ import {
 import { Search, Upload, Filter, Trash2, Edit } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { deleteVideoFromR2, extractKeyFromUrl } from "@/lib/r2Storage";
 
 interface UserVideo {
   id: number;
