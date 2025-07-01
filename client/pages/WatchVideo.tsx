@@ -354,25 +354,38 @@ export default function WatchVideo() {
 
                 if (error) {
                   let errorMessage = "";
+                  let debugInfo = "";
+
                   switch (error.code) {
                     case 1: // MEDIA_ERR_ABORTED
                       errorMessage = "Video loading was aborted";
+                      debugInfo = "The video loading process was cancelled.";
                       break;
                     case 2: // MEDIA_ERR_NETWORK
-                      errorMessage =
-                        "Network error occurred while loading video";
+                      errorMessage = "Network error while loading video";
+                      debugInfo =
+                        "Check your internet connection and CORS configuration.";
                       break;
                     case 3: // MEDIA_ERR_DECODE
                       errorMessage = "Video format error or corrupted file";
+                      debugInfo =
+                        "The video file may be corrupted or in an unsupported format.";
                       break;
                     case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
                       errorMessage =
                         "Video format not supported or file not found";
+                      debugInfo =
+                        "The video URL may be incorrect or the file format is not supported.";
                       break;
                     default:
                       errorMessage = `Video error (code: ${error.code})`;
+                      debugInfo = `Unknown error type: ${error.code}`;
                   }
-                  setError(errorMessage);
+
+                  console.error(
+                    `📝 Error Details: ${errorMessage} - ${debugInfo}`,
+                  );
+                  setError(`${errorMessage}. ${debugInfo}`);
 
                   // Run connectivity test for R2 videos
                   if (
