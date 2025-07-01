@@ -1,6 +1,6 @@
 /**
- * Cloudflare R2 Storage Service
- * Handles video and thumbnail uploads to Cloudflare R2
+ * Video Storage Service
+ * Handles video and thumbnail storage with R2 fallback to IndexedDB
  */
 
 const R2_ENDPOINT =
@@ -11,8 +11,104 @@ export interface UploadResult {
   key: string;
 }
 
+// IndexedDB helper for fallback storage
+class VideoStorage {
+  private dbName = "IncluVidStorage";
+  private version = 1;
+  private db: IDBDatabase | null = null;
+
+  async init(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, this.version);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        this.db = request.result;
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains("videos")) {
+          db.createObjectStore("videos", { keyPath: "key" });
+        }
+      };
+    });
+  }
+
+  async store(key: string, file: File | Blob): Promise<string> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["videos"], "readwrite");
+      const store = transaction.objectStore("videos");
+
+      // Convert file to ArrayBuffer for storage
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = {
+          key,
+          data: reader.result,
+          type: file.type,
+          size: file.size,
+          timestamp: Date.now(),
+        };
+
+        const request = store.put(data);
+        request.onsuccess = () => {
+          // Return a blob URL for the stored file
+          const blob = new Blob([reader.result as ArrayBuffer], {
+            type: file.type,
+          });
+          const url = URL.createObjectURL(blob);
+          resolve(url);
+        };
+        request.onerror = () => reject(request.error);
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async retrieve(key: string): Promise<Blob | null> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["videos"], "readonly");
+      const store = transaction.objectStore("videos");
+      const request = store.get(key);
+
+      request.onsuccess = () => {
+        const result = request.result;
+        if (result) {
+          const blob = new Blob([result.data], { type: result.type });
+          resolve(blob);
+        } else {
+          resolve(null);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async delete(key: string): Promise<void> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["videos"], "readwrite");
+      const store = transaction.objectStore("videos");
+      const request = store.delete(key);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+}
+
+const videoStorage = new VideoStorage();
+
 /**
- * Uploads a file to Cloudflare R2
+ * Uploads a file with R2 fallback to IndexedDB
  * @param file - File to upload
  * @param key - Storage key/path for the file
  * @returns Promise with upload result
@@ -22,10 +118,7 @@ export const uploadToR2 = async (
   key: string,
 ): Promise<UploadResult> => {
   try {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("key", key);
-
+    // Try R2 upload first
     const response = await fetch(`${R2_ENDPOINT}/${key}`, {
       method: "PUT",
       body: file,
@@ -34,23 +127,27 @@ export const uploadToR2 = async (
       },
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      const url = `${R2_ENDPOINT}/${key}`;
+      return { url, key };
+    } else {
       throw new Error(
-        `Upload failed: ${response.status} ${response.statusText}`,
+        `R2 upload failed: ${response.status} ${response.statusText}`,
       );
     }
-
-    const url = `${R2_ENDPOINT}/${key}`;
-
-    return {
-      url,
-      key,
-    };
   } catch (error) {
-    console.error("Error uploading to R2:", error);
-    throw new Error(
-      `Failed to upload file: ${error instanceof Error ? error.message : "Unknown error"}`,
-    );
+    console.warn("R2 upload failed, using local storage:", error);
+
+    // Fallback to IndexedDB
+    try {
+      const url = await videoStorage.store(key, file);
+      return { url, key };
+    } catch (fallbackError) {
+      console.error("Fallback storage also failed:", fallbackError);
+      throw new Error(
+        `Both R2 and local storage failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
   }
 };
 
