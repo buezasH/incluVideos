@@ -270,65 +270,116 @@ export default function EditVideo() {
     }
   };
 
-  const handleUploadVideo = () => {
+  const handleUploadVideo = async () => {
     const trimMetadata = uploadData?.trimMetadata;
+    setIsUploading(true);
 
-    if (isExistingVideo && id) {
-      // Update existing video
-      const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
-      const videoIndex = userVideos.findIndex(
-        (v: any) => v.id.toString() === id,
-      );
+    try {
+      if (isExistingVideo && id) {
+        // Update existing video metadata only
+        setUploadProgress("Updating video information...");
 
-      if (videoIndex !== -1) {
-        userVideos[videoIndex] = {
-          ...userVideos[videoIndex],
+        const userVideos = JSON.parse(
+          localStorage.getItem("userVideos") || "[]",
+        );
+        const videoIndex = userVideos.findIndex(
+          (v: any) => v.id.toString() === id,
+        );
+
+        if (videoIndex !== -1) {
+          userVideos[videoIndex] = {
+            ...userVideos[videoIndex],
+            title: uploadData.title,
+            description: uploadData.description,
+            finalDuration: trimMetadata
+              ? trimMetadata.trimmedDuration
+              : duration,
+            wasTrimmed: !!trimMetadata,
+            trimData: trimMetadata || null,
+            lastEditedAt: new Date().toISOString(),
+          };
+
+          localStorage.setItem("userVideos", JSON.stringify(userVideos));
+          navigate(`/watch/${id}`);
+        }
+      } else {
+        // Upload new video to R2
+        const videoId = uploadData.videoId || generateVideoId();
+
+        // Get the original file from localStorage
+        const pendingUpload = JSON.parse(
+          localStorage.getItem("pendingVideoUpload") || "{}",
+        );
+
+        if (!pendingUpload.fileName) {
+          throw new Error("No video file found for upload");
+        }
+
+        setUploadProgress("Uploading video to cloud storage...");
+
+        // Upload video to R2
+        const videoBlob = await fetch(videoUrl).then((res) => res.blob());
+        const videoFile = new File([videoBlob], pendingUpload.fileName, {
+          type: pendingUpload.fileType,
+        });
+
+        const videoUploadResult = await uploadVideoToR2(videoFile, videoId);
+
+        // Upload thumbnail to R2 if available
+        let thumbnailUrl = "";
+        if (uploadData.thumbnail) {
+          setUploadProgress("Uploading thumbnail...");
+          const thumbnailUploadResult = await uploadThumbnailDataUrlToR2(
+            uploadData.thumbnail,
+            videoId,
+          );
+          thumbnailUrl = thumbnailUploadResult.url;
+        }
+
+        setUploadProgress("Saving video information...");
+
+        const finalVideoData = {
+          id: videoId,
           title: uploadData.title,
           description: uploadData.description,
+          videoUrl: videoUploadResult.url,
+          thumbnail: thumbnailUrl || videoUploadResult.url,
+          r2VideoKey: videoUploadResult.key,
+          r2ThumbnailKey: thumbnailUrl ? `thumbnails/${videoId}.jpg` : null,
+          author: {
+            name: "Current User",
+            avatar: "/placeholder.svg",
+            title: "Content Creator",
+            videoCount: 1,
+          },
+          uploadedAt: new Date().toISOString(),
+          originalDuration: trimMetadata
+            ? trimMetadata.trimEnd - trimMetadata.trimStart
+            : duration,
           finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
           wasTrimmed: !!trimMetadata,
           trimData: trimMetadata || null,
-          lastEditedAt: new Date().toISOString(),
         };
 
-        localStorage.setItem("userVideos", JSON.stringify(userVideos));
-        navigate(`/watch/${id}`);
+        const existingVideos = JSON.parse(
+          localStorage.getItem("userVideos") || "[]",
+        );
+        existingVideos.push(finalVideoData);
+        localStorage.setItem("userVideos", JSON.stringify(existingVideos));
+
+        // Clear upload data for new videos
+        localStorage.removeItem("pendingVideoUpload");
+
+        navigate(`/watch/${videoId}`);
       }
-    } else {
-      // Create new video entry
-      const videoId = Date.now();
-
-      const finalVideoData = {
-        id: videoId,
-        title: uploadData.title,
-        description: uploadData.description,
-        videoUrl: videoUrl,
-        thumbnail: uploadData.thumbnail || videoUrl,
-        author: {
-          name: "Current User",
-          avatar: "/placeholder.svg",
-          title: "Content Creator",
-          videoCount: 1,
-        },
-        uploadedAt: new Date().toISOString(),
-        originalDuration: trimMetadata
-          ? trimMetadata.trimEnd - trimMetadata.trimStart
-          : duration,
-        finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
-        wasTrimmed: !!trimMetadata,
-        trimData: trimMetadata || null,
-      };
-
-      const existingVideos = JSON.parse(
-        localStorage.getItem("userVideos") || "[]",
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert(
+        `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
-      existingVideos.push(finalVideoData);
-      localStorage.setItem("userVideos", JSON.stringify(existingVideos));
-
-      // Clear upload data for new videos
-      localStorage.removeItem("pendingVideoUpload");
-
-      navigate(`/watch/${videoId}`);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress("");
     }
   };
 
