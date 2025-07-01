@@ -348,9 +348,7 @@ export default function EditVideo() {
 
     try {
       if (isExistingVideo && id) {
-        // Update existing video metadata only
-        setUploadProgress("Updating video information...");
-
+        // Update existing video - upload new version if trimmed
         const userVideos = JSON.parse(
           localStorage.getItem("userVideos") || "[]",
         );
@@ -359,15 +357,89 @@ export default function EditVideo() {
         );
 
         if (videoIndex !== -1) {
+          let newVideoUrl = userVideos[videoIndex].videoUrl;
+          let newThumbnailUrl = userVideos[videoIndex].thumbnail;
+
+          // If video was trimmed, upload the new trimmed version
+          if (trimMetadata && trimMetadata.trimmedBlob) {
+            setUploadProgress("Uploading edited video to cloud storage...");
+
+            // Create a file from the trimmed blob
+            const originalFileName =
+              userVideos[videoIndex].title
+                .replace(/[^a-z0-9]/gi, "_")
+                .toLowerCase() + ".webm";
+            const trimmedVideoFile = new File(
+              [trimMetadata.trimmedBlob],
+              originalFileName,
+              {
+                type: "video/webm",
+              },
+            );
+
+            // Upload the trimmed video to R2
+            const videoUploadResult = await uploadVideoToR2(
+              trimmedVideoFile,
+              id as string,
+            );
+            newVideoUrl = videoUploadResult.url;
+
+            // Generate new thumbnail from trimmed video if needed
+            if (trimmedVideoUrl) {
+              setUploadProgress("Generating new thumbnail...");
+
+              const video = document.createElement("video");
+              video.src = trimmedVideoUrl;
+              video.crossOrigin = "anonymous";
+
+              await new Promise<void>((resolve) => {
+                video.onloadeddata = () => {
+                  video.currentTime = 1; // Get thumbnail from 1 second in
+                  video.onseeked = async () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    if (ctx) {
+                      canvas.width = video.videoWidth;
+                      canvas.height = video.videoHeight;
+                      ctx.drawImage(video, 0, 0);
+
+                      const thumbnailDataUrl = canvas.toDataURL(
+                        "image/jpeg",
+                        0.8,
+                      );
+                      const thumbnailUploadResult =
+                        await uploadThumbnailDataUrlToR2(
+                          thumbnailDataUrl,
+                          id as string,
+                        );
+                      newThumbnailUrl = thumbnailUploadResult.url;
+                    }
+                    resolve();
+                  };
+                };
+              });
+            }
+          }
+
+          setUploadProgress("Updating video information...");
+
           userVideos[videoIndex] = {
             ...userVideos[videoIndex],
             title: uploadData.title,
             description: uploadData.description,
+            videoUrl: newVideoUrl,
+            thumbnail: newThumbnailUrl,
             finalDuration: trimMetadata
               ? trimMetadata.trimmedDuration
               : duration,
             wasTrimmed: !!trimMetadata,
-            trimData: trimMetadata || null,
+            trimData: trimMetadata
+              ? {
+                  trimStart: trimMetadata.trimStart,
+                  trimEnd: trimMetadata.trimEnd,
+                  trimmedDuration: trimMetadata.trimmedDuration,
+                }
+              : null,
             lastEditedAt: new Date().toISOString(),
           };
 
