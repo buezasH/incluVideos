@@ -85,6 +85,11 @@ export const register: RequestHandler = async (req, res) => {
   } catch (error: any) {
     console.error("Registration error:", error);
 
+    // Ensure response hasn't been sent already
+    if (res.headersSent) {
+      return;
+    }
+
     // Handle mongoose validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map(
@@ -96,7 +101,7 @@ export const register: RequestHandler = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Server error",
       message: "An error occurred during registration",
     });
@@ -166,7 +171,13 @@ export const login: RequestHandler = async (req, res) => {
     console.log(`✅ User logged in: ${user.username} (${user.role})`);
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({
+
+    // Ensure response hasn't been sent already
+    if (res.headersSent) {
+      return;
+    }
+
+    return res.status(500).json({
       error: "Server error",
       message: "An error occurred during login",
     });
