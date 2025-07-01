@@ -240,14 +240,29 @@ export default function WatchVideo() {
               {error || "Video not found"}
             </h2>
             <p className="text-gray-600 mb-4">
-              The video you're looking for could not be loaded.
+              {video
+                ? "There was an issue loading the video. This might be due to network connectivity or the video file location."
+                : "The video you're looking for could not be found."}
             </p>
-            <button
-              onClick={() => window.history.back()}
-              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-            >
-              Go Back
-            </button>
+            <div className="flex gap-3 justify-center">
+              {video && (
+                <button
+                  onClick={() => {
+                    setError("");
+                    window.location.reload();
+                  }}
+                  className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+                >
+                  Retry
+                </button>
+              )}
+              <button
+                onClick={() => window.history.back()}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Go Back
+              </button>
+            </div>
           </div>
         </div>
       </Layout>
