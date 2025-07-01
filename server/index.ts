@@ -5,7 +5,13 @@ import { handleDemo } from "./routes/demo";
 import { uploadVideo, deleteVideo, uploadMiddleware } from "./routes/upload";
 import { getVideo, listVideos, checkVideoExists } from "./routes/videos";
 import { testR2Structure } from "./routes/r2-test";
-import { register, login, getProfile, logout } from "./routes/auth";
+import {
+  register,
+  login,
+  getProfile,
+  getProfileById,
+  logout,
+} from "./routes/auth";
 import {
   createVideo,
   getVideo,
