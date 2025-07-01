@@ -328,15 +328,29 @@ export default function WatchVideo() {
                 const target = e.target as HTMLVideoElement;
                 const error = target.error;
 
-                console.error("Video load error details:", {
-                  errorCode: error?.code,
-                  errorMessage: error?.message,
-                  videoSrc: target.src,
-                  networkState: target.networkState,
-                  readyState: target.readyState,
-                  currentTime: target.currentTime,
-                  event: e,
-                });
+                console.error("🚨 Video load error details:");
+                console.error("   Error code:", error?.code);
+                console.error("   Error message:", error?.message);
+                console.error("   Video src:", target.src);
+                console.error("   Network state:", target.networkState);
+                console.error("   Ready state:", target.readyState);
+                console.error("   Current time:", target.currentTime);
+                console.error("   Error object:", error);
+                console.error("   Event:", e);
+
+                // Additional debugging for R2 videos
+                if (target.src.includes("r2.cloudflarestorage.com")) {
+                  console.error("🌐 R2 Video Debug Info:");
+                  console.error("   Full URL:", target.src);
+                  console.error("   URL accessible test incoming...");
+
+                  // Test URL accessibility
+                  fetch(target.src, { method: "HEAD", mode: "no-cors" })
+                    .then(() => console.log("✅ R2 URL is reachable"))
+                    .catch((err) =>
+                      console.error("❌ R2 URL fetch failed:", err),
+                    );
+                }
 
                 if (error) {
                   let errorMessage = "";
