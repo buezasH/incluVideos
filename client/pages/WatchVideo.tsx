@@ -73,6 +73,10 @@ export default function WatchVideo() {
         setLoading(true);
         setError("");
 
+        // Check network status
+        console.log("Network status:", navigator.onLine ? "Online" : "Offline");
+        console.log("User agent:", navigator.userAgent);
+
         // Try to load user video first
         const result = await loadVideoForPlayback(id);
 
