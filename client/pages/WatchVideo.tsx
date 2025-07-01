@@ -97,26 +97,39 @@ export default function WatchVideo() {
 
             if (videoMetadata.userId) {
               try {
-                const response = await fetch(
-                  `/api/auth/profile/${videoMetadata.userId}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                  },
-                );
+                const token = localStorage.getItem("token");
+                const userId =
+                  typeof videoMetadata.userId === "string"
+                    ? videoMetadata.userId
+                    : videoMetadata.userId.toString();
 
-                if (response.ok) {
-                  const userProfile = await response.json();
-                  uploaderInfo = {
-                    name: userProfile.username || "Content Creator",
-                    avatar: "/placeholder.svg",
-                    title: userProfile.role || "Caregiver",
-                    videoCount: userProfile.videoCount || 1,
-                  };
+                if (token && userId) {
+                  const response = await fetch(`/api/auth/profile/${userId}`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  });
+
+                  if (response.ok) {
+                    const userProfile = await response.json();
+                    uploaderInfo = {
+                      name: userProfile.username || "Content Creator",
+                      avatar: "/placeholder.svg",
+                      title: userProfile.role || "Caregiver",
+                      videoCount: userProfile.videoCount || 1,
+                    };
+                  } else {
+                    console.log(
+                      "Failed to fetch uploader info:",
+                      response.status,
+                    );
+                  }
                 }
               } catch (userError) {
-                console.log("Could not fetch uploader info, using defaults");
+                console.log(
+                  "Could not fetch uploader info, using defaults:",
+                  userError,
+                );
               }
             }
 
