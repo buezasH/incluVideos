@@ -25,20 +25,6 @@ export interface VideoData {
 }
 
 /**
- * Checks if a video URL is accessible
- */
-export const checkVideoAccessibility = async (
-  url: string,
-): Promise<boolean> => {
-  try {
-    const response = await fetch(url, { method: "HEAD" });
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
-
-/**
  * Gets video data by ID from localStorage
  */
 export const getVideoById = (id: string): VideoData | null => {
@@ -48,25 +34,6 @@ export const getVideoById = (id: string): VideoData | null => {
   } catch {
     return null;
   }
-};
-
-/**
- * Validates that a video's R2 URLs are accessible
- */
-export const validateVideoUrls = async (
-  video: VideoData,
-): Promise<{
-  videoAccessible: boolean;
-  thumbnailAccessible: boolean;
-}> => {
-  const [videoAccessible, thumbnailAccessible] = await Promise.all([
-    checkVideoAccessibility(video.videoUrl),
-    video.thumbnail
-      ? checkVideoAccessibility(video.thumbnail)
-      : Promise.resolve(true),
-  ]);
-
-  return { videoAccessible, thumbnailAccessible };
 };
 
 /**
