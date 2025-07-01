@@ -507,12 +507,16 @@ export default function EditVideo() {
             videoCount: 1,
           },
           uploadedAt: new Date().toISOString(),
-          originalDuration: trimMetadata
-            ? trimMetadata.trimEnd - trimMetadata.trimStart
-            : duration,
+          originalDuration: duration,
           finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
           wasTrimmed: !!trimMetadata,
-          trimData: trimMetadata || null,
+          trimData: trimMetadata
+            ? {
+                trimStart: trimMetadata.trimStart,
+                trimEnd: trimMetadata.trimEnd,
+                trimmedDuration: trimMetadata.trimmedDuration,
+              }
+            : null,
         };
 
         const existingVideos = JSON.parse(
