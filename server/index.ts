@@ -3,6 +3,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { uploadVideo, deleteVideo, uploadMiddleware } from "./routes/upload";
 import { getVideo, listVideos, checkVideoExists } from "./routes/videos";
+import { testR2Structure } from "./routes/r2-test";
 
 export function createServer() {
   const app = express();
@@ -27,6 +28,9 @@ export function createServer() {
   app.get("/api/videos/:id", getVideo);
   app.get("/api/videos", listVideos);
   app.get("/api/videos/check/:key", checkVideoExists);
+
+  // R2 debug routes
+  app.get("/api/r2/test", testR2Structure);
 
   return app;
 }
