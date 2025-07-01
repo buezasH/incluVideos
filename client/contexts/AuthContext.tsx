@@ -178,27 +178,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, email, password, role }),
       });
 
+      // Check for service unavailable first (before reading body)
+      if (response.status === 503) {
+        console.log("🔄 Authentication service unavailable - using demo mode");
+        const demoUser = {
+          id: "demo-user",
+          username: username,
+          email: email,
+          role: role,
+          createdAt: new Date().toISOString(),
+        };
+        setUser(demoUser);
+        setToken("demo-token");
+        localStorage.setItem("auth_token", "demo-token");
+        localStorage.setItem("auth_user", JSON.stringify(demoUser));
+        return;
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        // Check if it's a service unavailable error (MongoDB down)
-        if (response.status === 503) {
-          console.log(
-            "🔄 Authentication service unavailable - using demo mode",
-          );
-          const demoUser = {
-            id: "demo-user",
-            username: username,
-            email: email,
-            role: role,
-            createdAt: new Date().toISOString(),
-          };
-          setUser(demoUser);
-          setToken("demo-token");
-          localStorage.setItem("auth_token", "demo-token");
-          localStorage.setItem("auth_user", JSON.stringify(demoUser));
-          return;
-        }
         throw new Error(data.message || "Registration failed");
       }
 
