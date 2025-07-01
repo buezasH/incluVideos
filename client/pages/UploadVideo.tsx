@@ -40,6 +40,7 @@ export default function UploadVideo() {
   const [language, setLanguage] = useState("english");
   const [thumbnail, setThumbnail] = useState<string>("");
   const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false);
+  const [videoId] = useState<string>(() => generateVideoId());
 
   const handleTagRemove = (tagToRemove: string) => {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
