@@ -49,16 +49,17 @@ const videoSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "Daily Living",
-        "Health & Safety",
-        "Social Skills",
-        "Communication",
-        "Work Skills",
-        "Recreation",
-        "Education",
-        "Other",
+        "life-skills",
+        "health-safety",
+        "social-skills",
+        "communication",
+        "work-skills",
+        "recreation",
+        "education",
+        "daily-living",
+        "other",
       ],
-      default: "Other",
+      default: "other",
     },
     tags: [
       {
