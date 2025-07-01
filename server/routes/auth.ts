@@ -253,6 +253,49 @@ export const getProfile: RequestHandler = async (req, res) => {
 };
 
 /**
+ * Get user profile by ID (for displaying uploader info)
+ */
+export const getProfileById: RequestHandler = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        error: "Invalid user ID",
+        message: "The provided user ID is not valid",
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+        message: "User profile not found",
+      });
+    }
+
+    // Count user's videos for display
+    const { Video } = await import("../models/Video.js");
+    const videoCount = await Video.countDocuments({ userId: user._id });
+
+    res.json({
+      success: true,
+      id: user._id,
+      username: user.username,
+      role: user.role,
+      videoCount,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    console.error("Get profile by ID error:", error);
+    res.status(500).json({
+      error: "Server error",
+      message: "An error occurred while fetching user profile",
+    });
+  }
+};
+
+/**
  * Logout user (invalidate token on client side)
  */
 export const logout: RequestHandler = async (req, res) => {
