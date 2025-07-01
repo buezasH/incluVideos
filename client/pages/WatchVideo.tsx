@@ -55,12 +55,48 @@ export default function WatchVideo() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [video, setVideo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
-  // Check for user uploaded videos first
-  const userVideos = JSON.parse(localStorage.getItem("userVideos") || "[]");
-  const userVideo = userVideos.find((v: any) => v.id.toString() === id);
-  const video =
-    userVideo || videoData[id as keyof typeof videoData] || videoData[1];
+  // Load video data
+  useEffect(() => {
+    const loadVideo = () => {
+      try {
+        // Check for user uploaded videos first
+        const userVideos = JSON.parse(
+          localStorage.getItem("userVideos") || "[]",
+        );
+        const userVideo = userVideos.find((v: any) => v.id.toString() === id);
+
+        if (userVideo) {
+          setVideo(userVideo);
+          setLoading(false);
+          return;
+        }
+
+        // Fall back to sample videos
+        const sampleVideo = videoData[id as keyof typeof videoData];
+        if (sampleVideo) {
+          setVideo(sampleVideo);
+          setLoading(false);
+          return;
+        }
+
+        // If no video found
+        setError("Video not found");
+        setLoading(false);
+      } catch (err) {
+        console.error("Error loading video:", err);
+        setError("Error loading video");
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadVideo();
+    }
+  }, [id]);
 
   useEffect(() => {
     const videoElement = videoRef.current;
