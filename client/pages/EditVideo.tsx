@@ -271,63 +271,11 @@ export default function EditVideo() {
 
           // If video was trimmed, we'll save the trim metadata for playback control
           if (trimMetadata && trimMetadata.needsServerProcessing) {
-            setUploadProgress("Uploading edited video to cloud storage...");
+            setUploadProgress("Saving trim information...");
 
-            // Create a file from the trimmed blob
-            const originalFileName =
-              userVideos[videoIndex].title
-                .replace(/[^a-z0-9]/gi, "_")
-                .toLowerCase() + ".webm";
-            const trimmedVideoFile = new File(
-              [trimMetadata.trimmedBlob],
-              originalFileName,
-              {
-                type: "video/webm",
-              },
-            );
-
-            // Upload the trimmed video to R2
-            const videoUploadResult = await uploadVideoToR2(
-              trimmedVideoFile,
-              id as string,
-            );
-            newVideoUrl = videoUploadResult.url;
-
-            // Generate new thumbnail from trimmed video if needed
-            if (trimmedVideoUrl) {
-              setUploadProgress("Generating new thumbnail...");
-
-              const video = document.createElement("video");
-              video.src = trimmedVideoUrl;
-              video.crossOrigin = "anonymous";
-
-              await new Promise<void>((resolve) => {
-                video.onloadeddata = () => {
-                  video.currentTime = 1; // Get thumbnail from 1 second in
-                  video.onseeked = async () => {
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    if (ctx) {
-                      canvas.width = video.videoWidth;
-                      canvas.height = video.videoHeight;
-                      ctx.drawImage(video, 0, 0);
-
-                      const thumbnailDataUrl = canvas.toDataURL(
-                        "image/jpeg",
-                        0.8,
-                      );
-                      const thumbnailUploadResult =
-                        await uploadThumbnailDataUrlToR2(
-                          thumbnailDataUrl,
-                          id as string,
-                        );
-                      newThumbnailUrl = thumbnailUploadResult.url;
-                    }
-                    resolve();
-                  };
-                };
-              });
-            }
+            // For now, keep the original video URL and save trim metadata
+            // The video player will handle trim boundaries during playback
+            console.log("Video trimming metadata saved for playback control");
           }
 
           setUploadProgress("Updating video information...");
