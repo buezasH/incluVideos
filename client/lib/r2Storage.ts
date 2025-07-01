@@ -218,20 +218,21 @@ export const uploadThumbnailDataUrlToR2 = async (
  */
 export const deleteFromR2 = async (key: string): Promise<void> => {
   try {
-    // Try R2 delete first
-    const response = await fetch(`${R2_ENDPOINT}/${key}`, {
+    // Try backend delete first
+    const response = await fetch(`/api/upload/${encodeURIComponent(key)}`, {
       method: "DELETE",
     });
 
     if (response.ok || response.status === 404) {
       return; // Successfully deleted or doesn't exist
     } else {
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        `R2 delete failed: ${response.status} ${response.statusText}`,
+        `Server delete failed: ${response.status} ${errorData.message || response.statusText}`,
       );
     }
   } catch (error) {
-    console.warn("R2 delete failed, trying local storage:", error);
+    console.warn("Server delete failed, trying local storage:", error);
 
     // Fallback to IndexedDB deletion
     try {
