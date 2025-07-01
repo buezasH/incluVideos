@@ -78,13 +78,12 @@ export default function WatchVideo() {
 
         if (result.video) {
           setVideo(result.video);
-
-          if (result.error) {
-            setError(result.error);
-          }
-
           setLoading(false);
           return;
+        }
+
+        if (result.error) {
+          setError(result.error);
         }
 
         // Fall back to sample videos
