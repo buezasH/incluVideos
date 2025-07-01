@@ -8,10 +8,14 @@ const upload = multer({
     fileSize: 500 * 1024 * 1024, // 500MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("video/")) {
+    // Accept both video files and image files (for thumbnails)
+    if (
+      file.mimetype.startsWith("video/") ||
+      file.mimetype.startsWith("image/")
+    ) {
       cb(null, true);
     } else {
-      cb(new Error("Only video files are allowed"));
+      cb(new Error("Only video and image files are allowed"));
     }
   },
 });
