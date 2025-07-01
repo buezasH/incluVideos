@@ -133,8 +133,23 @@ export const getVideoDisplayUrl = (video: VideoData): string => {
 };
 
 /**
- * Generates a video thumbnail URL
+ * Generates a video thumbnail URL (handles both R2 and local URLs)
  */
 export const getThumbnailUrl = (video: VideoData): string => {
-  return video.thumbnail || video.videoUrl;
+  let thumbnailUrl = video.thumbnail || video.videoUrl;
+
+  // Convert S3 API URLs to public R2.dev URLs for thumbnails
+  if (thumbnailUrl.includes("r2.cloudflarestorage.com/incluvid/")) {
+    const key = thumbnailUrl.split("/incluvid/")[1];
+    thumbnailUrl = `https://pub-9878674a1e04468f900a641553d1adbb.r2.dev/${key}`;
+    console.log(
+      `🔄 Converted thumbnail S3 URL to public R2.dev URL: ${thumbnailUrl}`,
+    );
+  } else if (thumbnailUrl.includes(".r2.dev")) {
+    console.log(
+      `✅ Already using public R2.dev thumbnail URL: ${thumbnailUrl}`,
+    );
+  }
+
+  return thumbnailUrl;
 };
