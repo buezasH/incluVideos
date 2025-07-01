@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { uploadVideo, deleteVideo, uploadMiddleware } from "./routes/upload";
 
 export function createServer() {
   const app = express();
@@ -16,6 +17,10 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Upload routes
+  app.post("/api/upload", uploadMiddleware, uploadVideo);
+  app.delete("/api/upload/:key", deleteVideo);
 
   return app;
 }
