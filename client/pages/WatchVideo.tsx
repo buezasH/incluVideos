@@ -66,16 +66,23 @@ export default function WatchVideo() {
 
   // Load video data
   useEffect(() => {
-    const loadVideo = () => {
-      try {
-        // Check for user uploaded videos first
-        const userVideos = JSON.parse(
-          localStorage.getItem("userVideos") || "[]",
-        );
-        const userVideo = userVideos.find((v: any) => v.id.toString() === id);
+    const loadVideo = async () => {
+      if (!id) return;
 
-        if (userVideo) {
-          setVideo(userVideo);
+      try {
+        setLoading(true);
+        setError("");
+
+        // Try to load user video first
+        const result = await loadVideoForPlayback(id);
+
+        if (result.video) {
+          setVideo(result.video);
+
+          if (result.error) {
+            setError(result.error);
+          }
+
           setLoading(false);
           return;
         }
@@ -98,9 +105,7 @@ export default function WatchVideo() {
       }
     };
 
-    if (id) {
-      loadVideo();
-    }
+    loadVideo();
   }, [id]);
 
   useEffect(() => {
