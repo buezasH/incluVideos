@@ -10,6 +10,15 @@ const JWT_SECRET =
  */
 export const authenticateToken: RequestHandler = async (req, res, next) => {
   try {
+    // Check if MongoDB is connected
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(503).json({
+        error: "Database unavailable",
+        message:
+          "MongoDB is not connected. Authentication temporarily disabled.",
+      });
+    }
+
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 

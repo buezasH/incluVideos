@@ -16,6 +16,15 @@ const generateToken = (userId: string): string => {
  */
 export const register: RequestHandler = async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(503).json({
+        error: "Database unavailable",
+        message:
+          "MongoDB is not connected. Please check server logs and ensure IP is whitelisted.",
+      });
+    }
+
     const { username, email, password, role } = req.body;
 
     // Validate required fields
@@ -107,6 +116,15 @@ export const register: RequestHandler = async (req, res) => {
  */
 export const login: RequestHandler = async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(503).json({
+        error: "Database unavailable",
+        message:
+          "MongoDB is not connected. Please check server logs and ensure IP is whitelisted.",
+      });
+    }
+
     const { username, password } = req.body;
 
     // Validate required fields

@@ -11,14 +11,29 @@ export const connectDB = async (): Promise<void> => {
       return;
     }
 
-    await mongoose.connect(MONGODB_URL);
+    // Add connection options for better reliability
+    await mongoose.connect(MONGODB_URL, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    });
     console.log("✅ MongoDB connected successfully to test database");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);
+
+    if (error instanceof Error && error.message.includes("IP")) {
+      console.log(
+        "💡 IP Address Issue: Please whitelist this server's IP in MongoDB Atlas",
+      );
+      console.log("🔗 Go to: MongoDB Atlas > Network Access > Add IP Address");
+      console.log(
+        "📍 Add: 0.0.0.0/0 (for development) or this server's specific IP",
+      );
+    }
+
     console.log(
-      "💡 Please ensure this server's IP is whitelisted in MongoDB Atlas",
+      "🔄 Continuing without database - authentication will not work",
     );
-    process.exit(1);
+    // Don't exit - let the server run for development
   }
 };
 
