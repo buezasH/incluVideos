@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { VideoCard } from "@/components/VideoCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const videoSections = [
   {
