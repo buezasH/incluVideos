@@ -374,9 +374,21 @@ export default function EditVideo() {
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert(
-        `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
+
+      // More user-friendly error messages
+      let errorMessage = "Upload failed. ";
+      if (error instanceof Error) {
+        if (error.message.includes("Failed to fetch")) {
+          errorMessage +=
+            "Using local storage instead of cloud storage. Your video is saved locally and you can continue editing.";
+        } else {
+          errorMessage += error.message;
+        }
+      } else {
+        errorMessage += "Unknown error occurred.";
+      }
+
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
       setUploadProgress("");
