@@ -198,26 +198,34 @@ export const uploadThumbnailDataUrlToR2 = async (
 };
 
 /**
- * Deletes a file from R2
+ * Deletes a file with R2 fallback to IndexedDB
  * @param key - Storage key of the file to delete
  * @returns Promise indicating success
  */
 export const deleteFromR2 = async (key: string): Promise<void> => {
   try {
+    // Try R2 delete first
     const response = await fetch(`${R2_ENDPOINT}/${key}`, {
       method: "DELETE",
     });
 
-    if (!response.ok && response.status !== 404) {
+    if (response.ok || response.status === 404) {
+      return; // Successfully deleted or doesn't exist
+    } else {
       throw new Error(
-        `Delete failed: ${response.status} ${response.statusText}`,
+        `R2 delete failed: ${response.status} ${response.statusText}`,
       );
     }
   } catch (error) {
-    console.error("Error deleting from R2:", error);
-    throw new Error(
-      `Failed to delete file: ${error instanceof Error ? error.message : "Unknown error"}`,
-    );
+    console.warn("R2 delete failed, trying local storage:", error);
+
+    // Fallback to IndexedDB deletion
+    try {
+      await videoStorage.delete(key);
+    } catch (fallbackError) {
+      console.warn("Local storage delete also failed:", fallbackError);
+      // Don't throw error for delete operations, just log it
+    }
   }
 };
 
