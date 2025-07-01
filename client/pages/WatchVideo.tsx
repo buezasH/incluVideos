@@ -209,6 +209,42 @@ export default function WatchVideo() {
     }
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="p-6 max-w-5xl">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading video...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !video) {
+    return (
+      <Layout>
+        <div className="p-6 max-w-5xl">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {error || "Video not found"}
+            </h2>
+            <p className="text-gray-600 mb-4">
+              The video you're looking for could not be loaded.
+            </p>
+            <button
+              onClick={() => window.history.back()}
+              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="p-6 max-w-5xl">
