@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { User, IUser } from "../models/User.js";
 
 const JWT_SECRET =

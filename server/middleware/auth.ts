@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { User } from "../models/User.js";
 
 const JWT_SECRET =
@@ -11,7 +12,7 @@ const JWT_SECRET =
 export const authenticateToken: RequestHandler = async (req, res, next) => {
   try {
     // Check if MongoDB is connected
-    if (require("mongoose").connection.readyState !== 1) {
+    if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         error: "Database unavailable",
         message:

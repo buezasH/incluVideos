@@ -98,21 +98,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, password }),
       });
 
-      let data;
-      try {
-        // Clone response to avoid "body stream already read" errors
-        const responseClone = response.clone();
-        data = await responseClone.json();
-      } catch (jsonError) {
-        // If response body is not valid JSON, throw a generic error
-        console.error("Login JSON parse error:", jsonError);
-        throw new Error(
-          `Login failed: ${response.status} ${response.statusText}`,
-        );
+      if (!response.ok) {
+        // For error responses, try to get error message but handle parsing failures
+        let errorMessage = `Login failed: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("Could not parse error response:", jsonError);
+        }
+        throw new Error(errorMessage);
       }
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Login JSON parse error:", jsonError);
+        throw new Error(`Login failed: Could not parse response`);
       }
 
       setToken(data.token);
@@ -146,21 +149,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, email, password, role }),
       });
 
-      let data;
-      try {
-        // Clone response to avoid "body stream already read" errors
-        const responseClone = response.clone();
-        data = await responseClone.json();
-      } catch (jsonError) {
-        // If response body is not valid JSON, throw a generic error
-        console.error("Registration JSON parse error:", jsonError);
-        throw new Error(
-          `Registration failed: ${response.status} ${response.statusText}`,
-        );
+      if (!response.ok) {
+        // For error responses, try to get error message but handle parsing failures
+        let errorMessage = `Registration failed: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("Could not parse error response:", jsonError);
+        }
+        throw new Error(errorMessage);
       }
 
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Registration JSON parse error:", jsonError);
+        throw new Error(`Registration failed: Could not parse response`);
       }
 
       setToken(data.token);
