@@ -37,6 +37,8 @@ export default function EditVideo() {
   const [trimmedVideoUrl, setTrimmedVideoUrl] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExistingVideo, setIsExistingVideo] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string>("");
 
   useEffect(() => {
     // Check if we're on /edit-videos/:id route (editing existing video)
