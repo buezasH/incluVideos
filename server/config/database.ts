@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const MONGODB_URL =
   process.env.MONGODB_URL ||
-  "mongodb+srv://alexisdlhb:n7Lq3sj4rjznxKXF@tfg.xmsn4s8.mongodb.net/?retryWrites=true&w=majority&appName=TFG";
+  "mongodb+srv://alexisdlhb:n7Lq3sj4rjznxKXF@tfg.xmsn4s8.mongodb.net/test?retryWrites=true&w=majority&appName=TFG";
 
 export const connectDB = async (): Promise<void> => {
   try {
@@ -12,16 +12,13 @@ export const connectDB = async (): Promise<void> => {
     }
 
     await mongoose.connect(MONGODB_URL);
-    console.log("✅ MongoDB connected successfully");
+    console.log("✅ MongoDB connected successfully to test database");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);
     console.log(
-      "🔄 Server will continue without MongoDB (authentication disabled)",
+      "💡 Please ensure this server's IP is whitelisted in MongoDB Atlas",
     );
-    console.log(
-      "💡 To enable authentication, whitelist this server's IP in MongoDB Atlas",
-    );
-    // Don't exit the process - let the server run without MongoDB
+    process.exit(1);
   }
 };
 
