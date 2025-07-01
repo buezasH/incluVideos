@@ -207,7 +207,8 @@ export const uploadThumbnailDataUrlToR2 = async (
   const response = await fetch(thumbnailDataUrl);
   const blob = await response.blob();
 
-  return uploadThumbnailToR2(blob, videoId);
+  const key = `thumbnails/${videoId}.jpg`;
+  return uploadToR2(blob, key, videoId, "thumbnail");
 };
 
 /**
