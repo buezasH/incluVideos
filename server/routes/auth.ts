@@ -21,7 +21,7 @@ export const register: RequestHandler = async (req, res) => {
     console.log("Request body:", { ...req.body, password: "[REDACTED]" });
 
     // Check if MongoDB is connected
-    if (require("mongoose").connection.readyState !== 1) {
+    if (mongoose.connection.readyState !== 1) {
       console.log("❌ MongoDB not connected - returning 503");
       return res.status(503).json({
         error: "Database unavailable",
@@ -132,7 +132,7 @@ export const register: RequestHandler = async (req, res) => {
 export const login: RequestHandler = async (req, res) => {
   try {
     // Check if MongoDB is connected
-    if (require("mongoose").connection.readyState !== 1) {
+    if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         error: "Database unavailable",
         message:
