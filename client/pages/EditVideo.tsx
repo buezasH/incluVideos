@@ -14,6 +14,12 @@ import {
 import { Play, Pause, Volume2, Maximize, Scissors } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  uploadVideoToR2,
+  uploadThumbnailDataUrlToR2,
+  generateVideoId,
+  getR2Url,
+} from "@/lib/r2Storage";
 
 export default function EditVideo() {
   const navigate = useNavigate();
