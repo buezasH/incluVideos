@@ -302,7 +302,15 @@ export default function WatchVideo() {
 
             {/* R2 URL Debugger for failed videos */}
             {video && video.videoUrl.includes("r2.cloudflarestorage.com") && (
-              <R2UrlTester videoUrl={video.videoUrl} />
+              <>
+                <R2UrlTester videoUrl={video.videoUrl} />
+                <VideoDebugger
+                  videoUrl={video.videoUrl}
+                  onTest={(result) =>
+                    console.log("🔬 Debug test completed:", result)
+                  }
+                />
+              </>
             )}
           </div>
         </div>
