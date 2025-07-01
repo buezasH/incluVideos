@@ -21,6 +21,7 @@ import {
 import { runConnectivityTest } from "@/lib/r2Test";
 import { R2UrlTester } from "@/components/R2UrlTester";
 import { VideoDebugger } from "@/components/VideoDebugger";
+import { logCorsDebugInfo, testCorsHeaders } from "@/lib/corsHelper";
 
 // Sample video data - in a real app this would come from an API
 const videoData = {
