@@ -94,17 +94,26 @@ export default function WatchVideo() {
           console.log("🖼️ Thumbnail URL:", thumbnailUrl);
           console.log(
             "☁️ Video is R2 video:",
-            result.video.videoUrl.includes("r2.cloudflarestorage.com"),
+            result.video.videoUrl.includes("r2.cloudflarestorage.com") ||
+              result.video.videoUrl.includes(".r2.dev"),
           );
           console.log("🔑 Video has R2 key:", !!result.video.r2VideoKey);
           console.log("📂 R2 video key:", result.video.r2VideoKey);
 
           // Test if URL structure is correct
-          if (result.video.videoUrl.includes("r2.cloudflarestorage.com")) {
+          if (
+            result.video.videoUrl.includes("r2.cloudflarestorage.com") ||
+            result.video.videoUrl.includes(".r2.dev")
+          ) {
             const urlParts = result.video.videoUrl.split("/");
             console.log("🔍 URL parts:", urlParts);
-            console.log("🪣 Bucket:", urlParts[urlParts.length - 2]);
-            console.log("📄 File key:", urlParts[urlParts.length - 1]);
+            if (result.video.videoUrl.includes(".r2.dev")) {
+              console.log("🌐 Public R2.dev URL");
+              console.log("📄 File path:", urlParts.slice(3).join("/"));
+            } else {
+              console.log("🪣 Bucket:", urlParts[urlParts.length - 2]);
+              console.log("📄 File key:", urlParts[urlParts.length - 1]);
+            }
           }
 
           // Check if URL looks valid
@@ -302,17 +311,19 @@ export default function WatchVideo() {
             </div>
 
             {/* R2 URL Debugger for failed videos */}
-            {video && video.videoUrl.includes("r2.cloudflarestorage.com") && (
-              <>
-                <R2UrlTester videoUrl={video.videoUrl} />
-                <VideoDebugger
-                  videoUrl={video.videoUrl}
-                  onTest={(result) =>
-                    console.log("🔬 Debug test completed:", result)
-                  }
-                />
-              </>
-            )}
+            {video &&
+              (video.videoUrl.includes("r2.cloudflarestorage.com") ||
+                video.videoUrl.includes(".r2.dev")) && (
+                <>
+                  <R2UrlTester videoUrl={video.videoUrl} />
+                  <VideoDebugger
+                    videoUrl={video.videoUrl}
+                    onTest={(result) =>
+                      console.log("🔬 Debug test completed:", result)
+                    }
+                  />
+                </>
+              )}
           </div>
         </div>
       </Layout>
@@ -349,7 +360,10 @@ export default function WatchVideo() {
                 console.error("   Event:", e);
 
                 // Additional debugging for R2 videos
-                if (target.src.includes("r2.cloudflarestorage.com")) {
+                if (
+                  target.src.includes("r2.cloudflarestorage.com") ||
+                  target.src.includes(".r2.dev")
+                ) {
                   console.error("🌐 R2 Video Debug Info:");
                   console.error("   Full URL:", target.src);
                   console.error("   URL accessible test incoming...");
@@ -400,7 +414,8 @@ export default function WatchVideo() {
                   // Run connectivity test for R2 videos
                   if (
                     video &&
-                    video.videoUrl.includes("r2.cloudflarestorage.com")
+                    (video.videoUrl.includes("r2.cloudflarestorage.com") ||
+                      video.videoUrl.includes(".r2.dev"))
                   ) {
                     console.log(
                       "🔍 Video failed to load, running comprehensive debugging...",
