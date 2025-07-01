@@ -76,8 +76,8 @@ export const uploadVideo: RequestHandler = async (req, res) => {
 
     await s3Client.send(uploadCommand);
 
-    // R2 public URL format: https://endpoint/bucket/key
-    const publicUrl = `${R2_CONFIG.endpoint}/${R2_CONFIG.bucket}/${key}`;
+    // R2 public URL using R2.dev domain (no CORS issues)
+    const publicUrl = `https://pub-9878674a1e04468f900a641553d1adbb.r2.dev/${key}`;
 
     res.json({
       success: true,
