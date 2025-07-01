@@ -83,20 +83,25 @@ class VideoStorage {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(["videos"], "readonly");
-      const store = transaction.objectStore("videos");
-      const request = store.get(key);
+      try {
+        const transaction = this.db!.transaction(["videos"], "readonly");
+        const store = transaction.objectStore("videos");
+        const request = store.get(key);
 
-      request.onsuccess = () => {
-        const result = request.result;
-        if (result) {
-          const blob = new Blob([result.data], { type: result.type });
-          resolve(blob);
-        } else {
-          resolve(null);
-        }
-      };
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const result = request.result;
+          if (result) {
+            const blob = new Blob([result.data], { type: result.type });
+            resolve(blob);
+          } else {
+            resolve(null);
+          }
+        };
+        request.onerror = () => reject(request.error);
+        transaction.onerror = () => reject(transaction.error);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
