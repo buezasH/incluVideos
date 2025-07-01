@@ -151,25 +151,33 @@ export const login: RequestHandler = async (req, res) => {
     }
 
     // Find user by username or email
+    console.log("🔍 Looking for user:", username);
     const user = await User.findOne({
       $or: [{ username }, { email: username }],
     }).select("+password");
 
     if (!user) {
+      console.log("❌ User not found:", username);
       return res.status(401).json({
         error: "Invalid credentials",
         message: "Username or password is incorrect",
       });
     }
 
+    console.log("✅ User found:", user.username);
+
     // Check password
+    console.log("🔐 Verifying password...");
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
+      console.log("❌ Password invalid for user:", user.username);
       return res.status(401).json({
         error: "Invalid credentials",
         message: "Username or password is incorrect",
       });
     }
+
+    console.log("✅ Password valid for user:", user.username);
 
     // Generate token
     const token = generateToken(user._id.toString());
