@@ -20,6 +20,13 @@ import {
   generateVideoId,
   getR2Url,
 } from "@/lib/r2Storage";
+import {
+  createVideoMetadata,
+  updateVideoMetadata,
+  getVideoMetadata,
+  CreateVideoData,
+  UpdateVideoData,
+} from "@/lib/videoMetadataService";
 
 export default function EditVideo() {
   const navigate = useNavigate();
@@ -257,52 +264,31 @@ export default function EditVideo() {
 
     try {
       if (isExistingVideo && id) {
-        // Update existing video - upload new version if trimmed
-        const userVideos = JSON.parse(
-          localStorage.getItem("userVideos") || "[]",
-        );
-        const videoIndex = userVideos.findIndex(
-          (v: any) => v.id.toString() === id,
-        );
+        // Update existing video metadata in MongoDB
+        setUploadProgress("Updating video information...");
 
-        if (videoIndex !== -1) {
-          let newVideoUrl = userVideos[videoIndex].videoUrl;
-          let newThumbnailUrl = userVideos[videoIndex].thumbnail;
+        const updateData: UpdateVideoData = {
+          title: uploadData.title,
+          description: uploadData.description,
+          category: uploadData.category,
+          tags: uploadData.tags,
+          finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
+          wasTrimmed: !!trimMetadata,
+          trimData: trimMetadata
+            ? {
+                trimStart: trimMetadata.trimStart,
+                trimEnd: trimMetadata.trimEnd,
+                trimmedDuration: trimMetadata.trimmedDuration,
+              }
+            : undefined,
+        };
 
-          // If video was trimmed, we'll save the trim metadata for playback control
-          if (trimMetadata && trimMetadata.needsServerProcessing) {
-            setUploadProgress("Saving trim information...");
+        // Update metadata in MongoDB
+        const updatedVideo = await updateVideoMetadata(id, updateData);
 
-            // For now, keep the original video URL and save trim metadata
-            // The video player will handle trim boundaries during playback
-            console.log("Video trimming metadata saved for playback control");
-          }
-
-          setUploadProgress("Updating video information...");
-
-          userVideos[videoIndex] = {
-            ...userVideos[videoIndex],
-            title: uploadData.title,
-            description: uploadData.description,
-            videoUrl: newVideoUrl,
-            thumbnail: newThumbnailUrl,
-            finalDuration: trimMetadata
-              ? trimMetadata.trimmedDuration
-              : duration,
-            wasTrimmed: !!trimMetadata,
-            trimData: trimMetadata
-              ? {
-                  trimStart: trimMetadata.trimStart,
-                  trimEnd: trimMetadata.trimEnd,
-                  trimmedDuration: trimMetadata.trimmedDuration,
-                }
-              : null,
-            lastEditedAt: new Date().toISOString(),
-          };
-
-          localStorage.setItem("userVideos", JSON.stringify(userVideos));
-          navigate(`/watch/${id}`);
-        }
+        console.log(`✅ Video updated in MongoDB: ${updatedVideo.title} (${id})`);
+        navigate(`/watch/${id}`);
+      }
       } else {
         // Upload new video to R2
         const videoId = uploadData.videoId || generateVideoId();
@@ -339,21 +325,17 @@ export default function EditVideo() {
 
         setUploadProgress("Saving video information...");
 
-        const finalVideoData = {
-          id: videoId,
+        // Prepare video metadata for MongoDB
+        const videoMetadata: CreateVideoData = {
           title: uploadData.title,
           description: uploadData.description,
+          category: uploadData.category || "Other",
+          tags: uploadData.tags || [],
           videoUrl: videoUploadResult.url,
-          thumbnail: thumbnailUrl || videoUploadResult.url,
+          thumbnailUrl: thumbnailUrl || undefined,
           r2VideoKey: videoUploadResult.key,
-          r2ThumbnailKey: thumbnailUrl ? `thumbnails/${videoId}.jpg` : null,
-          author: {
-            name: "Current User",
-            avatar: "/placeholder.svg",
-            title: "Content Creator",
-            videoCount: 1,
-          },
-          uploadedAt: new Date().toISOString(),
+          r2ThumbnailKey: thumbnailUrl ? `thumbnails/${videoId}.jpg` : undefined,
+          duration: duration,
           originalDuration: duration,
           finalDuration: trimMetadata ? trimMetadata.trimmedDuration : duration,
           wasTrimmed: !!trimMetadata,
@@ -363,19 +345,23 @@ export default function EditVideo() {
                 trimEnd: trimMetadata.trimEnd,
                 trimmedDuration: trimMetadata.trimmedDuration,
               }
-            : null,
+            : undefined,
+          isPublic: uploadData.isPublic !== undefined ? uploadData.isPublic : true,
+          accessibilityFeatures: {
+            hasSubtitles: false,
+            hasAudioDescription: false,
+            hasSignLanguage: false,
+          },
         };
 
-        const existingVideos = JSON.parse(
-          localStorage.getItem("userVideos") || "[]",
-        );
-        existingVideos.push(finalVideoData);
-        localStorage.setItem("userVideos", JSON.stringify(existingVideos));
+        // Save metadata to MongoDB
+        const savedVideo = await createVideoMetadata(videoMetadata);
 
         // Clear upload data for new videos
         localStorage.removeItem("pendingVideoUpload");
 
-        navigate(`/watch/${videoId}`);
+        console.log(`✅ Video saved to MongoDB: ${savedVideo.title} (${savedVideo.id})`);
+        navigate(`/watch/${savedVideo.id}`);
       }
     } catch (error) {
       console.error("Upload error:", error);
