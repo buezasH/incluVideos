@@ -48,6 +48,7 @@ export const register: RequestHandler = async (req, res) => {
     }
 
     // Create new user
+    console.log(`📝 Creating new user: ${username} (${role})`);
     const user = new User({
       username,
       email,
@@ -56,6 +57,7 @@ export const register: RequestHandler = async (req, res) => {
     });
 
     await user.save();
+    console.log(`✅ User saved to database: ${user._id}`);
 
     // Generate token
     const token = generateToken(user._id.toString());
