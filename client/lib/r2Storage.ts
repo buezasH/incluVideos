@@ -5,8 +5,8 @@
 
 import { setStorageMethod } from "./storageStatus";
 
-const R2_ENDPOINT =
-  "https://dee356186b2b200c89bcad92b58cdbb4.r2.cloudflarestorage.com/incluvid";
+const R2_PUBLIC_ENDPOINT =
+  "https://pub-9878674a1e04468f900a641553d1adbb.r2.dev";
 
 export interface UploadResult {
   url: string;
@@ -295,14 +295,21 @@ export const generateVideoId = (): string => {
  * @returns Public URL
  */
 export const getR2Url = (key: string): string => {
-  return `${R2_ENDPOINT}/${key}`;
+  return `${R2_PUBLIC_ENDPOINT}/${key}`;
 };
 
 /**
  * Extracts the storage key from an R2 URL
- * @param url - R2 URL
+ * @param url - R2 URL (supports both public and S3 API formats)
  * @returns Storage key
  */
 export const extractKeyFromUrl = (url: string): string => {
-  return url.replace(`${R2_ENDPOINT}/`, "");
+  // Handle public R2.dev URLs
+  if (url.includes(".r2.dev/")) {
+    return url.split(".r2.dev/")[1];
+  }
+  // Handle legacy S3 API URLs
+  const legacyEndpoint =
+    "https://dee356186b2b200c89bcad92b58cdbb4.r2.cloudflarestorage.com/incluvid";
+  return url.replace(`${legacyEndpoint}/`, "");
 };
