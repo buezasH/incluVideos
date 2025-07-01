@@ -102,6 +102,37 @@ export default function Index() {
         </div>
 
         <div className="space-y-8">
+          {/* User Videos Section */}
+          {userVideos.length > 0 && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-gray-900">
+                  Your Videos
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/edit-videos")}
+                >
+                  View all
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userVideos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    title={video.title}
+                    description={video.description}
+                    thumbnail={video.thumbnail}
+                    duration={formatDuration(video.finalDuration)}
+                    onClick={() => handleVideoClick(video.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sample Videos Sections */}
           {videoSections.map((section) => (
             <div key={section.title}>
               <div className="flex justify-between items-center mb-4">
