@@ -109,8 +109,9 @@ export default function UploadVideo() {
 
     // Store upload data in localStorage for the edit page
     const uploadData = {
+      videoId: videoId,
       file: uploadedFile,
-      fileUrl: URL.createObjectURL(uploadedFile),
+      fileUrl: URL.createObjectURL(uploadedFile), // Temporary local URL for editing
       title: videoTitle,
       description: videoDescription,
       tags: selectedTags,
