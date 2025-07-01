@@ -101,7 +101,9 @@ export const getAllUserVideos = (): VideoData[] => {
  */
 export const isR2Video = (video: VideoData): boolean => {
   return (
-    video.videoUrl.includes("r2.cloudflarestorage.com") || !!video.r2VideoKey
+    video.videoUrl.includes("r2.cloudflarestorage.com") ||
+    video.videoUrl.includes(".r2.dev") ||
+    !!video.r2VideoKey
   );
 };
 
@@ -109,14 +111,17 @@ export const isR2Video = (video: VideoData): boolean => {
  * Gets the display URL for video (handles both R2 and local URLs)
  */
 export const getVideoDisplayUrl = (video: VideoData): string => {
-  // For R2 videos, use the direct URL
+  // For R2 videos, convert to public R2.dev URL if needed
   if (isR2Video(video)) {
-    const url = video.videoUrl;
-    console.log(`🔗 R2 Video URL: ${url}`);
+    let url = video.videoUrl;
 
-    // Validate R2 URL format
-    if (!url.includes("r2.cloudflarestorage.com") && !url.includes("blob:")) {
-      console.warn("⚠️ Invalid R2 URL format:", url);
+    // Convert S3 API URLs to public R2.dev URLs
+    if (url.includes("r2.cloudflarestorage.com/incluvid/")) {
+      const key = url.split("/incluvid/")[1];
+      url = `https://pub-9878674a1e04468f900a641553d1adbb.r2.dev/${key}`;
+      console.log(`🔄 Converted S3 URL to public R2.dev URL: ${url}`);
+    } else if (url.includes(".r2.dev")) {
+      console.log(`✅ Already using public R2.dev URL: ${url}`);
     }
 
     return url;
