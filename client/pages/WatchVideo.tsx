@@ -403,9 +403,11 @@ export default function WatchVideo() {
                     video.videoUrl.includes("r2.cloudflarestorage.com")
                   ) {
                     console.log(
-                      "🔍 Video failed to load, running R2 connectivity test...",
+                      "🔍 Video failed to load, running comprehensive debugging...",
                     );
                     runConnectivityTest(video.videoUrl);
+                    logCorsDebugInfo();
+                    testCorsHeaders(video.videoUrl);
                   }
                 } else {
                   setError("Unknown video loading error");
