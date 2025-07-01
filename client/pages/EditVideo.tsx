@@ -715,8 +715,16 @@ export default function EditVideo() {
             <Button
               className="flex-1 bg-primary hover:bg-primary/90"
               onClick={handleUploadVideo}
+              disabled={isUploading}
             >
-              {isExistingVideo ? "Save Changes" : "Upload Video"} →
+              {isUploading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  {uploadProgress || "Processing..."}
+                </div>
+              ) : (
+                `${isExistingVideo ? "Save Changes" : "Upload Video"} →`
+              )}
             </Button>
           </div>
         </div>
