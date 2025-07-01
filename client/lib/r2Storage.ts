@@ -109,12 +109,17 @@ class VideoStorage {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(["videos"], "readwrite");
-      const store = transaction.objectStore("videos");
-      const request = store.delete(key);
+      try {
+        const transaction = this.db!.transaction(["videos"], "readwrite");
+        const store = transaction.objectStore("videos");
+        const request = store.delete(key);
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+        transaction.onerror = () => reject(transaction.error);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }
