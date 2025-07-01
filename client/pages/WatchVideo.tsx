@@ -87,16 +87,44 @@ export default function WatchVideo() {
           const videoMetadata = await getVideoMetadata(id);
 
           if (videoMetadata) {
+            // Fetch uploader information
+            let uploaderInfo = {
+              name: "Content Creator",
+              avatar: "/placeholder.svg",
+              title: "Caregiver",
+              videoCount: 1,
+            };
+
+            if (videoMetadata.userId) {
+              try {
+                const response = await fetch(
+                  `/api/auth/profile/${videoMetadata.userId}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  },
+                );
+
+                if (response.ok) {
+                  const userProfile = await response.json();
+                  uploaderInfo = {
+                    name: userProfile.username || "Content Creator",
+                    avatar: "/placeholder.svg",
+                    title: userProfile.role || "Caregiver",
+                    videoCount: userProfile.videoCount || 1,
+                  };
+                }
+              } catch (userError) {
+                console.log("Could not fetch uploader info, using defaults");
+              }
+            }
+
             const videoData = {
               ...videoMetadata,
               videoUrl: getVideoDisplayUrl(videoMetadata),
               thumbnail: getThumbnailUrl(videoMetadata),
-              author: {
-                name: "Content Creator",
-                avatar: "/placeholder.svg",
-                title: "Caregiver",
-                videoCount: 1,
-              },
+              author: uploaderInfo,
             };
 
             setVideo(videoData);
@@ -119,7 +147,7 @@ export default function WatchVideo() {
           console.log("🔗 Display video URL:", videoUrl);
           console.log("🖼️ Thumbnail URL:", thumbnailUrl);
           console.log(
-            "☁️ Video is R2 video:",
+            "��️ Video is R2 video:",
             result.video.videoUrl.includes("r2.cloudflarestorage.com") ||
               result.video.videoUrl.includes(".r2.dev"),
           );

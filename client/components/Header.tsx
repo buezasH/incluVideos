@@ -25,16 +25,13 @@ export function Header() {
           <User className="h-5 w-5" />
         </Button>
 
-        <div className="flex items-center space-x-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" alt="Maria Miller" />
-            <AvatarFallback>MM</AvatarFallback>
-          </Avatar>
-          <div className="text-sm">
-            <div className="font-medium">Maria Miller</div>
-            <div className="text-gray-500 text-xs">Customer</div>
-          </div>
-        </div>
+        <Avatar className="h-8 w-8">
+          <AvatarImage
+            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+            alt="User"
+          />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
       </div>
     </header>
   );
