@@ -288,14 +288,42 @@ export default function WatchVideo() {
               crossOrigin="anonymous"
               preload="metadata"
               onError={(e) => {
-                console.error("Video load error:", e);
                 const target = e.target as HTMLVideoElement;
-                if (target.error) {
-                  const errorMessage =
-                    target.error.code === 4
-                      ? "Video format not supported or file corrupted"
-                      : "Failed to load video. Please check your connection and try again.";
+                const error = target.error;
+
+                console.error("Video load error details:", {
+                  errorCode: error?.code,
+                  errorMessage: error?.message,
+                  videoSrc: target.src,
+                  networkState: target.networkState,
+                  readyState: target.readyState,
+                  currentTime: target.currentTime,
+                  event: e,
+                });
+
+                if (error) {
+                  let errorMessage = "";
+                  switch (error.code) {
+                    case 1: // MEDIA_ERR_ABORTED
+                      errorMessage = "Video loading was aborted";
+                      break;
+                    case 2: // MEDIA_ERR_NETWORK
+                      errorMessage =
+                        "Network error occurred while loading video";
+                      break;
+                    case 3: // MEDIA_ERR_DECODE
+                      errorMessage = "Video format error or corrupted file";
+                      break;
+                    case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
+                      errorMessage =
+                        "Video format not supported or file not found";
+                      break;
+                    default:
+                      errorMessage = `Video error (code: ${error.code})`;
+                  }
                   setError(errorMessage);
+                } else {
+                  setError("Unknown video loading error");
                 }
               }}
               onLoadStart={() => console.log("Video loading started")}
