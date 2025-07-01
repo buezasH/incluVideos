@@ -176,7 +176,7 @@ export const uploadVideoToR2 = async (
 ): Promise<UploadResult> => {
   const fileExtension = videoFile.name.split(".").pop() || "mp4";
   const key = `videos/${videoId}.${fileExtension}`;
-  return uploadToR2(videoFile, key);
+  return uploadToR2(videoFile, key, videoId, "video");
 };
 
 /**
