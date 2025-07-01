@@ -263,8 +263,8 @@ export default function WatchVideo() {
           <div className="relative bg-gray-900 aspect-video group">
             <video
               ref={videoRef}
-              src={video?.videoUrl}
-              poster={video?.thumbnail}
+              src={video ? getVideoDisplayUrl(video) : undefined}
+              poster={video ? getThumbnailUrl(video) : undefined}
               className="w-full h-full object-cover"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
@@ -272,10 +272,11 @@ export default function WatchVideo() {
               preload="metadata"
               onError={(e) => {
                 console.error("Video load error:", e);
-                setError("Failed to load video");
+                setError("Failed to load video from R2 storage");
               }}
               onLoadStart={() => console.log("Video loading started")}
               onCanPlay={() => console.log("Video can play")}
+              onLoadedData={() => console.log("Video data loaded")}
             />
 
             {/* Central Play Button */}
