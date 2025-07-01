@@ -77,9 +77,26 @@ export default function WatchVideo() {
         const result = await loadVideoForPlayback(id);
 
         if (result.video) {
+          const videoUrl = getVideoDisplayUrl(result.video);
+          const thumbnailUrl = getThumbnailUrl(result.video);
+
           console.log("Loaded video:", result.video.title);
-          console.log("Video URL:", result.video.videoUrl);
-          console.log("Thumbnail URL:", result.video.thumbnail);
+          console.log("Original video URL:", result.video.videoUrl);
+          console.log("Display video URL:", videoUrl);
+          console.log("Thumbnail URL:", thumbnailUrl);
+          console.log(
+            "Video is R2 video:",
+            result.video.videoUrl.includes("r2.cloudflarestorage.com"),
+          );
+          console.log("Video has R2 key:", !!result.video.r2VideoKey);
+
+          // Check if URL looks valid
+          if (!videoUrl || videoUrl === "undefined") {
+            setError("Invalid video URL");
+            setLoading(false);
+            return;
+          }
+
           setVideo(result.video);
           setLoading(false);
           return;
