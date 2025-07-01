@@ -16,45 +16,43 @@ import {
 import { Search, Upload, Filter, Trash2, Edit } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteVideoFromR2, extractKeyFromUrl } from "@/lib/r2Storage";
-
-interface UserVideo {
-  id: number | string;
-  title: string;
-  description: string;
-  videoUrl: string;
-  thumbnail: string;
-  r2VideoKey?: string;
-  r2ThumbnailKey?: string;
-  author: {
-    name: string;
-    avatar: string;
-    title: string;
-    videoCount: number;
-  };
-  uploadedAt: string;
-  originalDuration: number;
-  finalDuration: number;
-  wasTrimmed: boolean;
-  trimData: any;
-}
+import { deleteVideoFromR2 } from "@/lib/r2Storage";
+import {
+  getUserVideos,
+  deleteVideoMetadata,
+  VideoMetadata,
+} from "@/lib/videoMetadataService";
 
 export default function VideoGallery() {
   const navigate = useNavigate();
-  const [userVideos, setUserVideos] = useState<UserVideo[]>([]);
+  const [userVideos, setUserVideos] = useState<VideoMetadata[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredVideos, setFilteredVideos] = useState<UserVideo[]>([]);
-  const [videoToRemove, setVideoToRemove] = useState<UserVideo | null>(null);
+  const [filteredVideos, setFilteredVideos] = useState<VideoMetadata[]>([]);
+  const [videoToRemove, setVideoToRemove] = useState<VideoMetadata | null>(
+    null,
+  );
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // Load user videos from localStorage
-    const storedVideos = localStorage.getItem("userVideos");
-    if (storedVideos) {
-      const videos = JSON.parse(storedVideos);
-      setUserVideos(videos);
-      setFilteredVideos(videos);
-    }
+    // Load user videos from MongoDB
+    const loadVideos = async () => {
+      try {
+        setLoading(true);
+        const response = await getUserVideos();
+        setUserVideos(response.videos);
+        setFilteredVideos(response.videos);
+        setError("");
+      } catch (err) {
+        console.error("Error loading videos:", err);
+        setError("Failed to load videos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVideos();
   }, []);
 
   useEffect(() => {
@@ -71,7 +69,7 @@ export default function VideoGallery() {
     }
   }, [searchQuery, userVideos]);
 
-  const handleEditVideo = (videoId: number) => {
+  const handleEditVideo = (videoId: string) => {
     navigate(`/edit-videos/${videoId}`);
   };
 
@@ -79,7 +77,7 @@ export default function VideoGallery() {
     navigate("/upload");
   };
 
-  const handleRemoveVideo = (video: UserVideo, event: React.MouseEvent) => {
+  const handleRemoveVideo = (video: VideoMetadata, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent triggering edit action
     setVideoToRemove(video);
     setShowRemoveDialog(true);
@@ -89,20 +87,19 @@ export default function VideoGallery() {
     if (!videoToRemove) return;
 
     try {
-      // Delete from R2 storage if the video has R2 keys
-      if (videoToRemove.r2VideoKey || videoToRemove.r2ThumbnailKey) {
-        // Extract file extension from video URL or use default
-        const fileExtension = videoToRemove.videoUrl.split(".").pop() || "mp4";
-        await deleteVideoFromR2(videoToRemove.id.toString(), fileExtension);
+      // Delete metadata from MongoDB first
+      const deletedVideo = await deleteVideoMetadata(videoToRemove.id);
+
+      // Delete from R2 storage
+      if (deletedVideo.r2VideoKey) {
+        const fileExtension = deletedVideo.r2VideoKey.split(".").pop() || "mp4";
+        await deleteVideoFromR2(videoToRemove.id, fileExtension);
       }
 
-      // Remove from localStorage
+      // Update local state
       const updatedVideos = userVideos.filter(
         (video) => video.id !== videoToRemove.id,
       );
-      localStorage.setItem("userVideos", JSON.stringify(updatedVideos));
-
-      // Update state
       setUserVideos(updatedVideos);
       setFilteredVideos(
         updatedVideos.filter(
@@ -116,6 +113,8 @@ export default function VideoGallery() {
       // Close dialog
       setShowRemoveDialog(false);
       setVideoToRemove(null);
+
+      console.log(`✅ Video removed: ${videoToRemove.title}`);
     } catch (error) {
       console.error("Error deleting video:", error);
       alert("Failed to delete video. Please try again.");
@@ -140,6 +139,44 @@ export default function VideoGallery() {
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex-1 overflow-auto">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex-1 overflow-auto">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center min-h-[400px] flex flex-col items-center justify-center">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Error Loading Videos
+                </h2>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <Button onClick={() => window.location.reload()}>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -221,7 +258,7 @@ export default function VideoGallery() {
                     <div className="bg-white rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-all">
                       <div className="relative">
                         <img
-                          src={video.thumbnail}
+                          src={video.thumbnailUrl || video.videoUrl}
                           alt={video.title}
                           className="w-full h-48 object-cover"
                         />
