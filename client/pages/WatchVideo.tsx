@@ -85,15 +85,24 @@ export default function WatchVideo() {
           const videoUrl = getVideoDisplayUrl(result.video);
           const thumbnailUrl = getThumbnailUrl(result.video);
 
-          console.log("Loaded video:", result.video.title);
-          console.log("Original video URL:", result.video.videoUrl);
-          console.log("Display video URL:", videoUrl);
-          console.log("Thumbnail URL:", thumbnailUrl);
+          console.log("🎬 Loaded video:", result.video.title);
+          console.log("📍 Original video URL:", result.video.videoUrl);
+          console.log("🔗 Display video URL:", videoUrl);
+          console.log("🖼️ Thumbnail URL:", thumbnailUrl);
           console.log(
-            "Video is R2 video:",
+            "☁️ Video is R2 video:",
             result.video.videoUrl.includes("r2.cloudflarestorage.com"),
           );
-          console.log("Video has R2 key:", !!result.video.r2VideoKey);
+          console.log("🔑 Video has R2 key:", !!result.video.r2VideoKey);
+          console.log("📂 R2 video key:", result.video.r2VideoKey);
+
+          // Test if URL structure is correct
+          if (result.video.videoUrl.includes("r2.cloudflarestorage.com")) {
+            const urlParts = result.video.videoUrl.split("/");
+            console.log("🔍 URL parts:", urlParts);
+            console.log("🪣 Bucket:", urlParts[urlParts.length - 2]);
+            console.log("📄 File key:", urlParts[urlParts.length - 1]);
+          }
 
           // Check if URL looks valid
           if (!videoUrl || videoUrl === "undefined") {
