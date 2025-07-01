@@ -19,11 +19,13 @@ import { useNavigate } from "react-router-dom";
 import { deleteVideoFromR2, extractKeyFromUrl } from "@/lib/r2Storage";
 
 interface UserVideo {
-  id: number;
+  id: number | string;
   title: string;
   description: string;
   videoUrl: string;
   thumbnail: string;
+  r2VideoKey?: string;
+  r2ThumbnailKey?: string;
   author: {
     name: string;
     avatar: string;
