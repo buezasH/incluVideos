@@ -73,9 +73,25 @@ const videoSections = [
 
 export default function Index() {
   const navigate = useNavigate();
+  const [userVideos, setUserVideos] = useState<any[]>([]);
 
-  const handleVideoClick = (videoId: number) => {
+  useEffect(() => {
+    // Load user videos from localStorage
+    const storedVideos = localStorage.getItem("userVideos");
+    if (storedVideos) {
+      const videos = JSON.parse(storedVideos);
+      setUserVideos(videos.slice(0, 6)); // Show only first 6 user videos
+    }
+  }, []);
+
+  const handleVideoClick = (videoId: number | string) => {
     navigate(`/watch/${videoId}`);
+  };
+
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   return (
