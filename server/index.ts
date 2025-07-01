@@ -55,6 +55,7 @@ export function createServer() {
   app.post("/api/auth/register", register);
   app.post("/api/auth/login", login);
   app.get("/api/auth/profile", authenticateToken, getProfile);
+  app.get("/api/auth/profile/:userId", authenticateToken, getProfileById);
   app.post("/api/auth/logout", logout);
 
   // Video metadata routes
