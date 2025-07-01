@@ -42,30 +42,37 @@ class VideoStorage {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(["videos"], "readwrite");
-      const store = transaction.objectStore("videos");
-
-      // Convert file to ArrayBuffer for storage
+      // Convert file to ArrayBuffer first
       const reader = new FileReader();
       reader.onload = () => {
-        const data = {
-          key,
-          data: reader.result,
-          type: file.type,
-          size: file.size,
-          timestamp: Date.now(),
-        };
+        try {
+          // Create transaction inside the reader callback to avoid timeout
+          const transaction = this.db!.transaction(["videos"], "readwrite");
+          const store = transaction.objectStore("videos");
 
-        const request = store.put(data);
-        request.onsuccess = () => {
-          // Return a blob URL for the stored file
-          const blob = new Blob([reader.result as ArrayBuffer], {
+          const data = {
+            key,
+            data: reader.result,
             type: file.type,
-          });
-          const url = URL.createObjectURL(blob);
-          resolve(url);
-        };
-        request.onerror = () => reject(request.error);
+            size: file.size,
+            timestamp: Date.now(),
+          };
+
+          const request = store.put(data);
+          request.onsuccess = () => {
+            // Return a blob URL for the stored file
+            const blob = new Blob([reader.result as ArrayBuffer], {
+              type: file.type,
+            });
+            const url = URL.createObjectURL(blob);
+            resolve(url);
+          };
+          request.onerror = () => reject(request.error);
+
+          transaction.onerror = () => reject(transaction.error);
+        } catch (error) {
+          reject(error);
+        }
       };
       reader.onerror = () => reject(reader.error);
       reader.readAsArrayBuffer(file);
