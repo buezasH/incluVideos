@@ -344,6 +344,17 @@ export default function WatchVideo() {
                       errorMessage = `Video error (code: ${error.code})`;
                   }
                   setError(errorMessage);
+
+                  // Run connectivity test for R2 videos
+                  if (
+                    video &&
+                    video.videoUrl.includes("r2.cloudflarestorage.com")
+                  ) {
+                    console.log(
+                      "🔍 Video failed to load, running R2 connectivity test...",
+                    );
+                    runConnectivityTest(video.videoUrl);
+                  }
                 } else {
                   setError("Unknown video loading error");
                 }
