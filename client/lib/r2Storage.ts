@@ -131,6 +131,7 @@ export const uploadToR2 = async (
 
     if (response.ok) {
       const url = `${R2_ENDPOINT}/${key}`;
+      setStorageMethod("r2");
       return { url, key };
     } else {
       throw new Error(
@@ -143,6 +144,7 @@ export const uploadToR2 = async (
     // Fallback to IndexedDB
     try {
       const url = await videoStorage.store(key, file);
+      setStorageMethod("local");
       return { url, key };
     } catch (fallbackError) {
       console.error("Fallback storage also failed:", fallbackError);
