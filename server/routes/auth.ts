@@ -131,6 +131,12 @@ export const register: RequestHandler = async (req, res) => {
  */
 export const login: RequestHandler = async (req, res) => {
   try {
+    console.log("📝 Login request received");
+    console.log("Request body:", {
+      username: req.body.username,
+      password: "[REDACTED]",
+    });
+
     // Check if MongoDB is connected
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
