@@ -271,7 +271,14 @@ export default function WatchVideo() {
               preload="metadata"
               onError={(e) => {
                 console.error("Video load error:", e);
-                setError("Failed to load video from R2 storage");
+                const target = e.target as HTMLVideoElement;
+                if (target.error) {
+                  const errorMessage =
+                    target.error.code === 4
+                      ? "Video format not supported or file corrupted"
+                      : "Failed to load video. Please check your connection and try again.";
+                  setError(errorMessage);
+                }
               }}
               onLoadStart={() => console.log("Video loading started")}
               onCanPlay={() => console.log("Video can play")}
