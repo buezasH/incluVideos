@@ -111,10 +111,19 @@ export const isR2Video = (video: VideoData): boolean => {
 export const getVideoDisplayUrl = (video: VideoData): string => {
   // For R2 videos, use the direct URL
   if (isR2Video(video)) {
-    return video.videoUrl;
+    const url = video.videoUrl;
+    console.log(`🔗 R2 Video URL: ${url}`);
+
+    // Validate R2 URL format
+    if (!url.includes("r2.cloudflarestorage.com") && !url.includes("blob:")) {
+      console.warn("⚠️ Invalid R2 URL format:", url);
+    }
+
+    return url;
   }
 
   // For local videos, the URL should work as-is (blob URLs or data URLs)
+  console.log(`🔗 Local Video URL: ${video.videoUrl}`);
   return video.videoUrl;
 };
 
