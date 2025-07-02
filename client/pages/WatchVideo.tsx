@@ -221,9 +221,16 @@ export default function WatchVideo() {
             };
 
             // Load chapters if available
+            console.log(
+              "🔍 Checking for chapters in video metadata:",
+              videoMetadata.chapters,
+            );
             if (videoMetadata.chapters && videoMetadata.chapters.length > 0) {
               setChapters(videoMetadata.chapters);
               console.log("📖 Chapters loaded:", videoMetadata.chapters);
+            } else {
+              console.log("📖 No chapters found in video metadata");
+              setChapters([]); // Ensure chapters are cleared if none exist
             }
 
             setVideo(videoData);
