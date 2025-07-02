@@ -447,6 +447,7 @@ export default function EditVideo() {
             : undefined,
           isPublic:
             uploadData.isPublic !== undefined ? uploadData.isPublic : true,
+          chapters: chapters.length > 0 ? chapters : undefined,
           accessibilityFeatures: {
             hasSubtitles: false,
             hasAudioDescription: false,
