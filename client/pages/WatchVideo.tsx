@@ -156,17 +156,19 @@ export default function WatchVideo() {
           }
         }
 
-        // Try to load video from MongoDB first
-        try {
-          console.log("🔍 Attempting to load video metadata from MongoDB...");
+        // Try to load video from MongoDB first (only if ID looks like ObjectId)
+        const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+        if (isValidObjectId) {
+          try {
+            console.log("🔍 Attempting to load video metadata from MongoDB...");
 
-          // Add timeout and retry logic for fetch
-          const videoMetadata = (await Promise.race([
-            getVideoMetadata(id),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("Request timeout")), 10000),
-            ),
-          ])) as any;
+            // Add timeout and retry logic for fetch
+            const videoMetadata = (await Promise.race([
+              getVideoMetadata(id),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Request timeout")), 10000),
+              ),
+            ])) as any;
 
           if (videoMetadata) {
             console.log(
