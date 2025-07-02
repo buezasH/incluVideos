@@ -75,8 +75,14 @@ export default function EditVideo() {
             fileUrl: existingVideo.videoUrl,
             trimMetadata: existingVideo.trimData,
             isPublic: existingVideo.isPublic,
+            chapters: existingVideo.chapters,
           });
           setVideoUrl(existingVideo.videoUrl);
+
+          // Load existing chapters
+          if (existingVideo.chapters && existingVideo.chapters.length > 0) {
+            setChapters(existingVideo.chapters);
+          }
 
           // If the video was previously trimmed, set up the trim data
           if (existingVideo.trimData) {
