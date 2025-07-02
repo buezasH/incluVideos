@@ -47,6 +47,9 @@ export default function EditVideo() {
     }[]
   >([]);
   const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+  const [chapterErrors, setChapterErrors] = useState<Record<string, string>>(
+    {},
+  );
   const [uploadData, setUploadData] = useState<any>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [trimmedVideoUrl, setTrimmedVideoUrl] = useState<string>("");
