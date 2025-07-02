@@ -126,11 +126,31 @@ export default function WatchVideo() {
         console.log("User agent:", navigator.userAgent);
 
         // Quick check for simple numeric IDs (sample videos)
-        if (id && /^[12]$/.test(id)) {
-          console.log("🎬 Detected sample video ID, loading directly...");
+        if (id && /^\d+$/.test(id)) {
+          console.log(
+            "🎬 Detected simple numeric ID, checking sample videos...",
+          );
           const sampleVideo = videoData[id as keyof typeof videoData];
           if (sampleVideo) {
+            console.log("✅ Loading sample video directly:", sampleVideo.title);
+
+            // Load chapters from sample video if available
+            if (sampleVideo.chapters && sampleVideo.chapters.length > 0) {
+              setChapters(sampleVideo.chapters);
+              console.log(
+                "📖 Sample video chapters loaded:",
+                sampleVideo.chapters,
+              );
+            }
+
             setVideo(sampleVideo);
+            setLoading(false);
+            return;
+          } else {
+            console.log("❌ No sample video found for ID:", id);
+            setError(
+              `Sample video ${id} not found. Available sample videos: 1, 2`,
+            );
             setLoading(false);
             return;
           }
