@@ -135,11 +135,14 @@ export const getVideo: RequestHandler = async (req, res) => {
     }
 
     // Check if user can access this video
-    if (!video.isPublic && video.userId.toString() !== userId) {
-      return res.status(403).json({
-        error: "Access denied",
-        message: "You don't have permission to access this video",
-      });
+    if (!video.isPublic) {
+      // Private video - check if user is authenticated and owns the video
+      if (!userId || video.userId.toString() !== userId) {
+        return res.status(403).json({
+          error: "Access denied",
+          message: "You don't have permission to access this video",
+        });
+      }
     }
 
     // Increment view count
