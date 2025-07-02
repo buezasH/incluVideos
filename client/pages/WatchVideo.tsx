@@ -241,7 +241,11 @@ export default function WatchVideo() {
           console.log("📦 Falling back to legacy storage...");
         }
 
+        // Clear any error message from MongoDB attempt
+        setError("");
+
         // Fallback to legacy localStorage method
+        console.log("🔄 Attempting legacy video loading...");
         const result = await loadVideoForPlayback(id);
 
         if (result.video) {
@@ -293,15 +297,20 @@ export default function WatchVideo() {
         }
 
         // Fall back to sample videos
+        console.log("🎬 Checking sample videos...");
         const sampleVideo = videoData[id as keyof typeof videoData];
         if (sampleVideo) {
+          console.log("✅ Loading sample video:", sampleVideo.title);
           setVideo(sampleVideo);
           setLoading(false);
           return;
         }
 
-        // If no video found
-        setError("Video not found");
+        // If no video found anywhere
+        console.log("❌ No video found in any source");
+        setError(
+          "Video not found. This video may have been removed or the ID is incorrect.",
+        );
         setLoading(false);
       } catch (err) {
         console.error("Error loading video:", err);
