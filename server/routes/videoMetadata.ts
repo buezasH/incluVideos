@@ -29,6 +29,7 @@ export const createVideo: RequestHandler = async (req, res) => {
       finalDuration,
       wasTrimmed,
       trimData,
+      chapters,
       isPublic,
       accessibilityFeatures,
     } = req.body;
