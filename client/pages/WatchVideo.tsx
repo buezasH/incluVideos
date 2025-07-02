@@ -105,6 +105,17 @@ export default function WatchVideo() {
         console.log("Network status:", navigator.onLine ? "Online" : "Offline");
         console.log("User agent:", navigator.userAgent);
 
+        // Quick check for simple numeric IDs (sample videos)
+        if (id && /^[12]$/.test(id)) {
+          console.log("🎬 Detected sample video ID, loading directly...");
+          const sampleVideo = videoData[id as keyof typeof videoData];
+          if (sampleVideo) {
+            setVideo(sampleVideo);
+            setLoading(false);
+            return;
+          }
+        }
+
         // Try to load video from MongoDB first
         try {
           console.log("🔍 Attempting to load video metadata from MongoDB...");
