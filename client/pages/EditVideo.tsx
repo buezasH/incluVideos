@@ -120,7 +120,17 @@ export default function EditVideo() {
       setDuration(videoDuration);
       setTrimStart(0);
       setTrimEnd(videoDuration);
-      setSplitPoint(videoDuration / 2);
+
+      // Initialize with a single chapter if no chapters exist
+      if (chapters.length === 0) {
+        const initialChapter = {
+          id: `chapter-${Date.now()}`,
+          title: "Chapter 1",
+          startTime: 0,
+          endTime: videoDuration,
+        };
+        setChapters([initialChapter]);
+      }
     };
 
     const handleTimeUpdate = () => {
