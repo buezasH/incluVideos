@@ -346,6 +346,16 @@ export default function WatchVideo() {
         const sampleVideo = videoData[id as keyof typeof videoData];
         if (sampleVideo) {
           console.log("✅ Loading sample video:", sampleVideo.title);
+
+          // Load chapters from sample video if available
+          if (sampleVideo.chapters && sampleVideo.chapters.length > 0) {
+            setChapters(sampleVideo.chapters);
+            console.log(
+              "📖 Sample video chapters loaded:",
+              sampleVideo.chapters,
+            );
+          }
+
           setVideo(sampleVideo);
           setLoading(false);
           return;
