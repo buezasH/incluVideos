@@ -403,6 +403,39 @@ export default function WatchVideo() {
     }
   };
 
+  // Chapter utility functions
+  const getCurrentChapter = (time: number) => {
+    return (
+      chapters.find(
+        (chapter) => time >= chapter.startTime && time < chapter.endTime,
+      ) || null
+    );
+  };
+
+  const jumpToChapter = (chapter: { startTime: number }) => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    videoElement.currentTime = chapter.startTime;
+    setCurrentTime(chapter.startTime);
+  };
+
+  const getNextChapter = () => {
+    if (!currentChapter) return chapters[0] || null;
+    const currentIndex = chapters.findIndex(
+      (ch) => ch.id === currentChapter.id,
+    );
+    return chapters[currentIndex + 1] || null;
+  };
+
+  const getPreviousChapter = () => {
+    if (!currentChapter) return null;
+    const currentIndex = chapters.findIndex(
+      (ch) => ch.id === currentChapter.id,
+    );
+    return chapters[currentIndex - 1] || null;
+  };
+
   if (loading) {
     return (
       <Layout>
