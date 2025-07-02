@@ -60,6 +60,12 @@ export interface CreateVideoData {
     trimEnd: number;
     trimmedDuration: number;
   };
+  chapters?: {
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+  }[];
   isPublic?: boolean;
   accessibilityFeatures?: {
     hasSubtitles: boolean;
