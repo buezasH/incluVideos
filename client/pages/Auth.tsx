@@ -110,9 +110,9 @@ export default function Auth() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <img
-              src="https://imagedelivery.net/QCUubDKa8fgSBW6SJhgAJA/42b4e3e0-18be-4424-9b39-b8abe3b6e300/public"
+              src="/client/assets/logo.png"
               alt="IncluVid"
-              className="h-12 w-auto"
+              className="h-16 w-auto"
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">

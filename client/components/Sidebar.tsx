@@ -44,11 +44,10 @@ export function Sidebar() {
       <div className="p-6 border-b">
         <div className="flex items-center space-x-3">
           <img
-            src="https://imagedelivery.net/QCUubDKa8fgSBW6SJhgAJA/42b4e3e0-18be-4424-9b39-b8abe3b6e300/public"
-            alt="IncluVid Logo"
-            className="w-8 h-8 object-contain"
+            src="/client/assets/logo.png"
+            alt="IncluVid"
+            className="h-8 w-auto object-contain"
           />
-          <span className="font-semibold text-lg">IncluVid</span>
         </div>
       </div>
 
