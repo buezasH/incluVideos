@@ -41,7 +41,7 @@ export function Sidebar() {
   return (
     <div className="w-64 bg-white border-r min-h-screen flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b">
+      <div className="p-8 border-b">
         <div className="flex items-center space-x-3">
           <img
             src="/client/assets/logo.png"
