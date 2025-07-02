@@ -213,9 +213,6 @@ export default function EditVideo() {
       } else {
         setTrimEnd(Math.min(duration, Math.max(newTime, trimStart + 1)));
       }
-    } else if (editMode === "chapters") {
-      // In chapter mode, clicking sets a new chapter split point
-      addChapter();
     } else {
       seekToTime(newTime);
     }
