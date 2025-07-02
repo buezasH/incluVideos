@@ -65,6 +65,7 @@ export const createVideo: RequestHandler = async (req, res) => {
       finalDuration: finalDuration || duration,
       wasTrimmed: wasTrimmed || false,
       trimData,
+      chapters: chapters || [],
       isPublic: isPublic !== undefined ? isPublic : true,
       accessibilityFeatures: accessibilityFeatures || {
         hasSubtitles: false,
