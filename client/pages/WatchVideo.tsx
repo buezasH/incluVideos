@@ -234,6 +234,13 @@ export default function WatchVideo() {
             setError("Loading video data... Please wait.");
           } else if (mongoError.message?.includes("timeout")) {
             console.log("⏱️ Request timeout - falling back to legacy storage");
+          } else if (
+            mongoError.message?.includes("Video not found") ||
+            mongoError.message?.includes("Invalid video ID")
+          ) {
+            console.log(
+              "🎬 Video not found in MongoDB - checking other sources",
+            );
           } else {
             console.log("🔧 Unknown error:", mongoError);
           }
