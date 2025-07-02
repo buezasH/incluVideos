@@ -35,10 +35,18 @@ export default function EditVideo() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [editMode, setEditMode] = useState<"trim" | "split" | null>(null);
+  const [editMode, setEditMode] = useState<"trim" | "chapters" | null>(null);
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
-  const [splitPoint, setSplitPoint] = useState(0);
+  const [chapters, setChapters] = useState<
+    {
+      id: string;
+      title: string;
+      startTime: number;
+      endTime: number;
+    }[]
+  >([]);
+  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
   const [uploadData, setUploadData] = useState<any>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [trimmedVideoUrl, setTrimmedVideoUrl] = useState<string>("");
