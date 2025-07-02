@@ -98,12 +98,31 @@ export default function WatchVideo() {
             if (videoMetadata.userId) {
               try {
                 const token = localStorage.getItem("auth_token");
-                const userId =
-                  typeof videoMetadata.userId === "string"
-                    ? videoMetadata.userId
-                    : videoMetadata.userId.toString();
+                let userId: string;
 
-                if (token && userId) {
+                // Handle different types of userId (ObjectId vs string)
+                if (typeof videoMetadata.userId === "string") {
+                  userId = videoMetadata.userId;
+                } else if (
+                  videoMetadata.userId &&
+                  typeof videoMetadata.userId === "object"
+                ) {
+                  // If it's an ObjectId object, extract the string representation
+                  userId =
+                    (videoMetadata.userId as any)._id ||
+                    videoMetadata.userId.toString();
+                } else {
+                  userId = String(videoMetadata.userId);
+                }
+
+                console.log("Fetching uploader info for userId:", userId);
+
+                if (
+                  token &&
+                  userId &&
+                  userId !== "undefined" &&
+                  userId !== "[object Object]"
+                ) {
                   const response = await fetch(`/api/auth/profile/${userId}`, {
                     headers: {
                       Authorization: `Bearer ${token}`,
@@ -112,6 +131,7 @@ export default function WatchVideo() {
 
                   if (response.ok) {
                     const userProfile = await response.json();
+                    console.log("User profile fetched:", userProfile);
                     uploaderInfo = {
                       name: userProfile.username || "Content Creator",
                       avatar: "/placeholder.svg",
@@ -124,6 +144,8 @@ export default function WatchVideo() {
                       response.status,
                     );
                   }
+                } else {
+                  console.log("Invalid userId, skipping user fetch:", userId);
                 }
               } catch (userError) {
                 console.log(
