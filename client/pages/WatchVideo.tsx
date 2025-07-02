@@ -481,7 +481,12 @@ export default function WatchVideo() {
         <div className="p-6 max-w-5xl">
           <div className="bg-white rounded-lg p-8 text-center">
             <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading video...</p>
+            <p className="text-gray-600 mb-2">Loading video...</p>
+            {error === "Loading video data... Please wait." && (
+              <p className="text-sm text-gray-500">
+                Trying different sources, this may take a moment...
+              </p>
+            )}
           </div>
         </div>
       </Layout>
