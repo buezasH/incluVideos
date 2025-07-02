@@ -726,14 +726,15 @@ export default function EditVideo() {
                   {Math.floor(trimEnd - trimStart)}s duration)
                 </div>
               )}
-              {editMode === "split" && (
-                <div className="text-sm text-gray-600 bg-red-50 px-3 py-1 rounded">
-                  Split at: {Math.floor(splitPoint)}s
+              {editMode === "chapters" && (
+                <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded">
+                  Chapter Mode: Click timeline to add new chapter at current
+                  time
                 </div>
               )}
               {!editMode && !trimmedVideoUrl && !isProcessing && (
                 <div className="text-sm text-gray-600">
-                  Click timeline to seek, or use Trim/Split buttons to edit
+                  Click timeline to seek, or use Trim/Chapters buttons to edit
                 </div>
               )}
             </div>
