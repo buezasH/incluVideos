@@ -210,8 +210,9 @@ export default function EditVideo() {
       } else {
         setTrimEnd(Math.min(duration, Math.max(newTime, trimStart + 1)));
       }
-    } else if (editMode === "split") {
-      setSplitPoint(newTime);
+    } else if (editMode === "chapters") {
+      // In chapter mode, clicking sets a new chapter split point
+      addChapter();
     } else {
       seekToTime(newTime);
     }
@@ -341,9 +342,14 @@ export default function EditVideo() {
   const applyEdit = () => {
     if (editMode === "trim") {
       trimVideo();
-    } else if (editMode === "split") {
-      alert(`Splitting video at ${Math.floor(splitPoint)}s`);
+    } else if (editMode === "chapters") {
+      // Save chapters to upload data
+      setUploadData((prev) => ({
+        ...prev,
+        chapters,
+      }));
       setEditMode(null);
+      console.log("✅ Chapters saved:", chapters);
     }
   };
 
