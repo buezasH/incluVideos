@@ -200,6 +200,12 @@ export default function WatchVideo() {
               author: uploaderInfo,
             };
 
+            // Load chapters if available
+            if (videoMetadata.chapters && videoMetadata.chapters.length > 0) {
+              setChapters(videoMetadata.chapters);
+              console.log("📖 Chapters loaded:", videoMetadata.chapters);
+            }
+
             setVideo(videoData);
             setLoading(false);
             return;
