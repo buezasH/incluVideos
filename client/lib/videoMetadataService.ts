@@ -129,23 +129,46 @@ export const createVideoMetadata = async (
  */
 export const getVideoMetadata = async (id: string): Promise<VideoMetadata> => {
   try {
+    console.log("🔍 Fetching video metadata for ID:", id);
+    const headers = getAuthHeaders();
+    console.log("📤 Request headers:", headers);
+
     const response = await fetch(`/api/videos/${id}`, {
-      headers: getAuthHeaders(),
+      headers,
     });
+
+    console.log("📥 Response status:", response.status, response.statusText);
 
     if (!response.ok) {
       let errorMessage = `Failed to get video: ${response.status} ${response.statusText}`;
       try {
         const errorData = await response.json();
+        console.log("❌ Error response data:", errorData);
         errorMessage = errorData.message || errorMessage;
-      } catch {}
+      } catch (parseError) {
+        console.log("❌ Could not parse error response:", parseError);
+      }
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    console.log("✅ Video metadata loaded:", data);
     return data.video;
   } catch (error) {
     console.error("Get video metadata error:", error);
+
+    // Check if it's a network error
+    if (
+      error instanceof TypeError &&
+      error.message.includes("Failed to fetch")
+    ) {
+      console.error("🌐 Network error - this could be due to:");
+      console.error("   - Server not running");
+      console.error("   - CORS issues");
+      console.error("   - Network connectivity");
+      console.error("   - Invalid URL");
+    }
+
     throw error;
   }
 };
