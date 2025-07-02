@@ -238,46 +238,30 @@ export default function EditVideo() {
   const generateChapterTitle = (index: number) => `Chapter ${index + 1}`;
 
   const addChapter = () => {
-    if (chapters.length === 0) return;
-
     const newChapter = {
       id: `chapter-${Date.now()}`,
       title: generateChapterTitle(chapters.length),
-      startTime: currentTime,
+      startTime:
+        chapters.length > 0 ? Math.max(...chapters.map((c) => c.endTime)) : 0,
       endTime: duration,
     };
 
-    // Update the previous chapter's end time
-    const updatedChapters = [...chapters];
-    if (updatedChapters.length > 0) {
-      updatedChapters[updatedChapters.length - 1].endTime = currentTime;
-    }
-
-    updatedChapters.push(newChapter);
-    setChapters(updatedChapters);
+    setChapters([...chapters, newChapter]);
+    setChapterErrors({});
   };
 
   const removeChapter = (chapterId: string) => {
-    if (chapters.length <= 1) return; // Don't allow removing the last chapter
+    if (chapters.length <= 1) return;
 
     const updatedChapters = chapters.filter(
       (chapter) => chapter.id !== chapterId,
     );
-
-    // Adjust the remaining chapters to fill the gaps
-    for (let i = 0; i < updatedChapters.length; i++) {
-      if (i === 0) {
-        updatedChapters[i].startTime = 0;
-      } else {
-        updatedChapters[i].startTime = updatedChapters[i - 1].endTime;
-      }
-
-      if (i === updatedChapters.length - 1) {
-        updatedChapters[i].endTime = duration;
-      }
-    }
-
     setChapters(updatedChapters);
+
+    // Remove errors for deleted chapter
+    const newErrors = { ...chapterErrors };
+    delete newErrors[chapterId];
+    setChapterErrors(newErrors);
   };
 
   const updateChapterTitle = (chapterId: string, title: string) => {
@@ -285,6 +269,66 @@ export default function EditVideo() {
       chapter.id === chapterId ? { ...chapter, title } : chapter,
     );
     setChapters(updatedChapters);
+  };
+
+  const updateChapterTime = (
+    chapterId: string,
+    field: "startTime" | "endTime",
+    value: number,
+  ) => {
+    const updatedChapters = chapters.map((chapter) =>
+      chapter.id === chapterId ? { ...chapter, [field]: value } : chapter,
+    );
+
+    // Validate for overlaps
+    const errors = validateChapters(updatedChapters);
+    setChapterErrors(errors);
+    setChapters(updatedChapters);
+  };
+
+  const validateChapters = (chaptersToValidate: typeof chapters) => {
+    const errors: Record<string, string> = {};
+
+    chaptersToValidate.forEach((chapter, index) => {
+      // Check if start time is greater than or equal to end time
+      if (chapter.startTime >= chapter.endTime) {
+        errors[chapter.id] = "Start time must be less than end time";
+        return;
+      }
+
+      // Check if start time is negative
+      if (chapter.startTime < 0) {
+        errors[chapter.id] = "Start time cannot be negative";
+        return;
+      }
+
+      // Check if end time exceeds video duration
+      if (chapter.endTime > duration) {
+        errors[chapter.id] =
+          `End time cannot exceed video duration (${Math.floor(duration)}s)`;
+        return;
+      }
+
+      // Check for overlaps with other chapters
+      chaptersToValidate.forEach((otherChapter, otherIndex) => {
+        if (index !== otherIndex && !errors[chapter.id]) {
+          const overlap =
+            (chapter.startTime >= otherChapter.startTime &&
+              chapter.startTime < otherChapter.endTime) ||
+            (chapter.endTime > otherChapter.startTime &&
+              chapter.endTime <= otherChapter.endTime) ||
+            (chapter.startTime < otherChapter.startTime &&
+              chapter.endTime > otherChapter.endTime);
+
+          if (overlap) {
+            errors[chapter.id] =
+              `Overlaps with another chapter (${Math.floor(otherChapter.startTime)}s - ${Math.floor(otherChapter.endTime)}s)`;
+          }
+        }
+      });
+    });
+
+    return errors;
   };
 
   const seekToChapter = (chapter: { startTime: number }) => {
