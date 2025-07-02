@@ -90,7 +90,8 @@ export default function WatchVideo() {
             // Fetch uploader information
             let uploaderInfo = {
               name: "Content Creator",
-              avatar: "/placeholder.svg",
+              avatar:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
               title: "Caregiver",
               videoCount: 1,
             };
@@ -134,7 +135,8 @@ export default function WatchVideo() {
                     console.log("User profile fetched:", userProfile);
                     uploaderInfo = {
                       name: userProfile.username || "Content Creator",
-                      avatar: "/placeholder.svg",
+                      avatar:
+                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
                       title: userProfile.role || "Caregiver",
                       videoCount: userProfile.videoCount || 1,
                     };

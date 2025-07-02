@@ -106,7 +106,10 @@ export function Sidebar() {
         {/* User Profile */}
         <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded-lg">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" alt={user?.username} />
+            <AvatarImage
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face"
+              alt={user?.username}
+            />
             <AvatarFallback className="bg-primary text-white">
               {user?.username?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
