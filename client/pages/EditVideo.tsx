@@ -409,6 +409,14 @@ export default function EditVideo() {
     const trimMetadata = uploadData?.trimMetadata;
     setIsUploading(true);
 
+    // Ensure chapters are included in upload data if they exist
+    if (chapters.length > 0) {
+      setUploadData((prev) => ({
+        ...prev,
+        chapters,
+      }));
+    }
+
     try {
       if (isExistingVideo && id) {
         // Update existing video metadata in MongoDB
