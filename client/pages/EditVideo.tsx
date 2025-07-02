@@ -797,7 +797,7 @@ export default function EditVideo() {
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={!duration}
               >
-                Add Chapter at Current Time
+                Add New Chapter
               </Button>
             </div>
 
