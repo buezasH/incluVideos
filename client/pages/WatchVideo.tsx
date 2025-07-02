@@ -320,9 +320,18 @@ export default function WatchVideo() {
         }
 
         // Set relative time for display (0 to trimmed duration)
-        setCurrentTime(Math.max(0, actualTime - trimStart));
+        const displayTime = Math.max(0, actualTime - trimStart);
+        setCurrentTime(displayTime);
+
+        // Update current chapter
+        const chapter = getCurrentChapter(displayTime);
+        setCurrentChapter(chapter);
       } else {
         setCurrentTime(videoEl.currentTime);
+
+        // Update current chapter
+        const chapter = getCurrentChapter(videoEl.currentTime);
+        setCurrentChapter(chapter);
       }
     };
 
