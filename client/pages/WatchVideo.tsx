@@ -46,6 +46,26 @@ const videoData = {
       title: "Caregiver",
       videoCount: 42,
     },
+    chapters: [
+      {
+        id: "chapter-1",
+        title: "Introduction to Breakfast",
+        startTime: 0,
+        endTime: 30,
+      },
+      {
+        id: "chapter-2",
+        title: "Healthy Food Choices",
+        startTime: 30,
+        endTime: 60,
+      },
+      {
+        id: "chapter-3",
+        title: "Morning Routine Tips",
+        startTime: 60,
+        endTime: 90,
+      },
+    ],
   },
   2: {
     title: "Morning Hygiene Steps",
