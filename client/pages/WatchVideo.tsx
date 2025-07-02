@@ -170,142 +170,150 @@ export default function WatchVideo() {
               ),
             ])) as any;
 
-          if (videoMetadata) {
-            console.log(
-              "✅ Video metadata loaded from MongoDB:",
-              videoMetadata.title,
-            );
-            // Fetch uploader information
-            let uploaderInfo = {
-              name: "Content Creator",
-              avatar:
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-              title: "Caregiver",
-              videoCount: 1,
-            };
+            if (videoMetadata) {
+              console.log(
+                "✅ Video metadata loaded from MongoDB:",
+                videoMetadata.title,
+              );
+              // Fetch uploader information
+              let uploaderInfo = {
+                name: "Content Creator",
+                avatar:
+                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+                title: "Caregiver",
+                videoCount: 1,
+              };
 
-            if (videoMetadata.userId) {
-              try {
-                const token = localStorage.getItem("auth_token");
-                let userId: string;
+              if (videoMetadata.userId) {
+                try {
+                  const token = localStorage.getItem("auth_token");
+                  let userId: string;
 
-                // Handle different types of userId (ObjectId vs string)
-                if (typeof videoMetadata.userId === "string") {
-                  userId = videoMetadata.userId;
-                } else if (
-                  videoMetadata.userId &&
-                  typeof videoMetadata.userId === "object"
-                ) {
-                  // If it's an ObjectId object, extract the string representation
-                  userId =
-                    (videoMetadata.userId as any)._id ||
-                    videoMetadata.userId.toString();
-                } else {
-                  userId = String(videoMetadata.userId);
-                }
-
-                console.log("Fetching uploader info for userId:", userId);
-
-                if (
-                  token &&
-                  userId &&
-                  userId !== "undefined" &&
-                  userId !== "[object Object]"
-                ) {
-                  const response = await fetch(`/api/auth/profile/${userId}`, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  });
-
-                  if (response.ok) {
-                    const userProfile = await response.json();
-                    console.log("User profile fetched:", userProfile);
-                    uploaderInfo = {
-                      name: userProfile.username || "Content Creator",
-                      avatar:
-                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-                      title: userProfile.role || "Caregiver",
-                      videoCount: userProfile.videoCount || 1,
-                    };
+                  // Handle different types of userId (ObjectId vs string)
+                  if (typeof videoMetadata.userId === "string") {
+                    userId = videoMetadata.userId;
+                  } else if (
+                    videoMetadata.userId &&
+                    typeof videoMetadata.userId === "object"
+                  ) {
+                    // If it's an ObjectId object, extract the string representation
+                    userId =
+                      (videoMetadata.userId as any)._id ||
+                      videoMetadata.userId.toString();
                   } else {
-                    console.log(
-                      "Failed to fetch uploader info:",
-                      response.status,
-                    );
+                    userId = String(videoMetadata.userId);
                   }
-                } else {
-                  console.log("Invalid userId, skipping user fetch:", userId);
-                }
-              } catch (userError: any) {
-                console.log(
-                  "Could not fetch uploader info, using defaults:",
-                  userError?.message || userError,
-                );
 
-                // Check if it's an authentication error
-                if (
-                  userError?.message?.includes("401") ||
-                  userError?.message?.includes("Unauthorized")
-                ) {
-                  console.log("🔐 User info requires authentication");
-                } else if (userError?.message?.includes("Failed to fetch")) {
-                  console.log("🌐 Network error fetching user info");
+                  console.log("Fetching uploader info for userId:", userId);
+
+                  if (
+                    token &&
+                    userId &&
+                    userId !== "undefined" &&
+                    userId !== "[object Object]"
+                  ) {
+                    const response = await fetch(
+                      `/api/auth/profile/${userId}`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      },
+                    );
+
+                    if (response.ok) {
+                      const userProfile = await response.json();
+                      console.log("User profile fetched:", userProfile);
+                      uploaderInfo = {
+                        name: userProfile.username || "Content Creator",
+                        avatar:
+                          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                        title: userProfile.role || "Caregiver",
+                        videoCount: userProfile.videoCount || 1,
+                      };
+                    } else {
+                      console.log(
+                        "Failed to fetch uploader info:",
+                        response.status,
+                      );
+                    }
+                  } else {
+                    console.log("Invalid userId, skipping user fetch:", userId);
+                  }
+                } catch (userError: any) {
+                  console.log(
+                    "Could not fetch uploader info, using defaults:",
+                    userError?.message || userError,
+                  );
+
+                  // Check if it's an authentication error
+                  if (
+                    userError?.message?.includes("401") ||
+                    userError?.message?.includes("Unauthorized")
+                  ) {
+                    console.log("🔐 User info requires authentication");
+                  } else if (userError?.message?.includes("Failed to fetch")) {
+                    console.log("🌐 Network error fetching user info");
+                  }
                 }
               }
+
+              const videoData = {
+                ...videoMetadata,
+                videoUrl: getVideoDisplayUrl(videoMetadata),
+                thumbnail: getThumbnailUrl(videoMetadata),
+                author: uploaderInfo,
+              };
+
+              // Load chapters if available
+              console.log(
+                "🔍 Checking for chapters in video metadata:",
+                videoMetadata.chapters,
+              );
+              if (videoMetadata.chapters && videoMetadata.chapters.length > 0) {
+                setChapters(videoMetadata.chapters);
+                console.log("📖 Chapters loaded:", videoMetadata.chapters);
+              } else {
+                console.log("📖 No chapters found in video metadata");
+                setChapters([]); // Ensure chapters are cleared if none exist
+              }
+
+              setVideo(videoData);
+              setLoading(false);
+              return;
             }
+          } catch (mongoError: any) {
+            console.log("📝 MongoDB video load failed:", mongoError.message);
 
-            const videoData = {
-              ...videoMetadata,
-              videoUrl: getVideoDisplayUrl(videoMetadata),
-              thumbnail: getThumbnailUrl(videoMetadata),
-              author: uploaderInfo,
-            };
-
-            // Load chapters if available
-            console.log(
-              "🔍 Checking for chapters in video metadata:",
-              videoMetadata.chapters,
-            );
-            if (videoMetadata.chapters && videoMetadata.chapters.length > 0) {
-              setChapters(videoMetadata.chapters);
-              console.log("📖 Chapters loaded:", videoMetadata.chapters);
+            // More specific error handling
+            if (
+              mongoError.message?.includes("401") ||
+              mongoError.message?.includes("Unauthorized")
+            ) {
+              console.log("🔐 Authentication required - user needs to log in");
+            } else if (mongoError.message?.includes("Failed to fetch")) {
+              console.log("🌐 Network error - retrying with legacy storage");
+              // Show user-friendly message
+              setError("Loading video data... Please wait.");
+            } else if (mongoError.message?.includes("timeout")) {
+              console.log(
+                "⏱️ Request timeout - falling back to legacy storage",
+              );
+            } else if (
+              mongoError.message?.includes("Video not found") ||
+              mongoError.message?.includes("Invalid video ID")
+            ) {
+              console.log(
+                "🎬 Video not found in MongoDB - checking other sources",
+              );
             } else {
-              console.log("📖 No chapters found in video metadata");
-              setChapters([]); // Ensure chapters are cleared if none exist
+              console.log("🔧 Unknown error:", mongoError);
             }
 
-            setVideo(videoData);
-            setLoading(false);
-            return;
+            console.log("📦 Falling back to legacy storage...");
           }
-        } catch (mongoError: any) {
-          console.log("📝 MongoDB video load failed:", mongoError.message);
-
-          // More specific error handling
-          if (
-            mongoError.message?.includes("401") ||
-            mongoError.message?.includes("Unauthorized")
-          ) {
-            console.log("🔐 Authentication required - user needs to log in");
-          } else if (mongoError.message?.includes("Failed to fetch")) {
-            console.log("🌐 Network error - retrying with legacy storage");
-            // Show user-friendly message
-            setError("Loading video data... Please wait.");
-          } else if (mongoError.message?.includes("timeout")) {
-            console.log("⏱️ Request timeout - falling back to legacy storage");
-          } else if (
-            mongoError.message?.includes("Video not found") ||
-            mongoError.message?.includes("Invalid video ID")
-          ) {
-            console.log(
-              "🎬 Video not found in MongoDB - checking other sources",
-            );
-          } else {
-            console.log("🔧 Unknown error:", mongoError);
-          }
-
-          console.log("📦 Falling back to legacy storage...");
+        } else {
+          console.log("🔍 ID format doesn't match ObjectId, skipping MongoDB");
         }
 
         // Clear any error message from MongoDB attempt
