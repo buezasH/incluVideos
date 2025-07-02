@@ -41,14 +41,13 @@ export function Sidebar() {
   return (
     <div className="w-64 bg-white border-r min-h-screen flex flex-col">
       {/* Logo */}
-      <div className="p-8 border-b">
-        <div className="flex items-center space-x-3">
-          <img
-            src="/client/assets/logo.png"
-            alt="IncluVid"
-            className="h-8 w-auto object-contain"
-          />
-        </div>
+      <div className="flex flex-col border-b" style={{ padding: "10px 20px" }}>
+        <img
+          src="/client/assets/logo.png"
+          alt="IncluVid"
+          className="w-auto object-contain mx-auto"
+          style={{ height: "72px" }}
+        />
       </div>
 
       {/* Navigation */}
