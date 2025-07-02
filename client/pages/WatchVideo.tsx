@@ -86,9 +86,14 @@ export default function WatchVideo() {
 
         // Try to load video from MongoDB first
         try {
+          console.log("🔍 Attempting to load video metadata from MongoDB...");
           const videoMetadata = await getVideoMetadata(id);
 
           if (videoMetadata) {
+            console.log(
+              "✅ Video metadata loaded from MongoDB:",
+              videoMetadata.title,
+            );
             // Fetch uploader information
             let uploaderInfo = {
               name: "Content Creator",
@@ -170,8 +175,20 @@ export default function WatchVideo() {
             setLoading(false);
             return;
           }
-        } catch (mongoError) {
-          console.log("Video not found in MongoDB, trying legacy storage");
+        } catch (mongoError: any) {
+          console.log("📝 MongoDB video load failed:", mongoError.message);
+
+          // Check if it's an authentication error
+          if (
+            mongoError.message?.includes("401") ||
+            mongoError.message?.includes("Unauthorized")
+          ) {
+            console.log("🔐 Authentication required - user needs to log in");
+          } else if (mongoError.message?.includes("Failed to fetch")) {
+            console.log("🌐 Network error - check server connection");
+          }
+
+          console.log("📦 Falling back to legacy storage...");
         }
 
         // Fallback to legacy localStorage method
