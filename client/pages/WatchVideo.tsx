@@ -156,11 +156,21 @@ export default function WatchVideo() {
                 } else {
                   console.log("Invalid userId, skipping user fetch:", userId);
                 }
-              } catch (userError) {
+              } catch (userError: any) {
                 console.log(
                   "Could not fetch uploader info, using defaults:",
-                  userError,
+                  userError?.message || userError,
                 );
+
+                // Check if it's an authentication error
+                if (
+                  userError?.message?.includes("401") ||
+                  userError?.message?.includes("Unauthorized")
+                ) {
+                  console.log("🔐 User info requires authentication");
+                } else if (userError?.message?.includes("Failed to fetch")) {
+                  console.log("🌐 Network error fetching user info");
+                }
               }
             }
 
@@ -459,7 +469,7 @@ export default function WatchVideo() {
                 const target = e.target as HTMLVideoElement;
                 const error = target.error;
 
-                console.error("🚨 Video load error details:");
+                console.error("�� Video load error details:");
                 console.error("   Error code:", error?.code);
                 console.error("   Error message:", error?.message);
                 console.error("   Video src:", target.src);
