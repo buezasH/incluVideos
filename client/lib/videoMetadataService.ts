@@ -23,6 +23,12 @@ export interface VideoMetadata {
     trimEnd: number;
     trimmedDuration: number;
   };
+  chapters?: {
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+  }[];
   uploadedAt: string;
   lastEditedAt?: string;
   views: number;
