@@ -650,6 +650,16 @@ export default function WatchVideo() {
 
             {/* Video Controls */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Current Chapter Title */}
+              {currentChapter && (
+                <div className="mb-2 text-center">
+                  <div className="inline-block bg-black/60 backdrop-blur-sm rounded-full px-4 py-1">
+                    <span className="text-white text-sm font-medium">
+                      📖 {currentChapter.title}
+                    </span>
+                  </div>
+                </div>
+              )}
               {/* Progress Bar */}
               <div
                 className="w-full bg-white/20 rounded-full h-1 mb-4 cursor-pointer relative"
