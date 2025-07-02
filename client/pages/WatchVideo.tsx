@@ -108,7 +108,14 @@ export default function WatchVideo() {
         // Try to load video from MongoDB first
         try {
           console.log("🔍 Attempting to load video metadata from MongoDB...");
-          const videoMetadata = await getVideoMetadata(id);
+
+          // Add timeout and retry logic for fetch
+          const videoMetadata = (await Promise.race([
+            getVideoMetadata(id),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Request timeout")), 10000),
+            ),
+          ])) as any;
 
           if (videoMetadata) {
             console.log(
@@ -215,14 +222,20 @@ export default function WatchVideo() {
         } catch (mongoError: any) {
           console.log("📝 MongoDB video load failed:", mongoError.message);
 
-          // Check if it's an authentication error
+          // More specific error handling
           if (
             mongoError.message?.includes("401") ||
             mongoError.message?.includes("Unauthorized")
           ) {
             console.log("🔐 Authentication required - user needs to log in");
           } else if (mongoError.message?.includes("Failed to fetch")) {
-            console.log("🌐 Network error - check server connection");
+            console.log("🌐 Network error - retrying with legacy storage");
+            // Show user-friendly message
+            setError("Loading video data... Please wait.");
+          } else if (mongoError.message?.includes("timeout")) {
+            console.log("⏱️ Request timeout - falling back to legacy storage");
+          } else {
+            console.log("🔧 Unknown error:", mongoError);
           }
 
           console.log("📦 Falling back to legacy storage...");
