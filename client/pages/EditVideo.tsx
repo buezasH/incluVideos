@@ -376,6 +376,7 @@ export default function EditVideo() {
                 trimmedDuration: trimMetadata.trimmedDuration,
               }
             : undefined,
+          chapters: chapters.length > 0 ? chapters : undefined,
         };
 
         // Update metadata in MongoDB
