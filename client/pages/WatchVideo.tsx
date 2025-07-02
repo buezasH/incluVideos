@@ -36,7 +36,8 @@ const videoData = {
       "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=450&fit=crop",
     author: {
       name: "Sarah Connors",
-      avatar: "/placeholder.svg",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
       title: "Caregiver",
       videoCount: 42,
     },
@@ -51,7 +52,8 @@ const videoData = {
       "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=450&fit=crop",
     author: {
       name: "Sarah Connors",
-      avatar: "/placeholder.svg",
+      avatar:
+        "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100&h=100&fit=crop&crop=face",
       title: "Caregiver",
       videoCount: 42,
     },
