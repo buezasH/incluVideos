@@ -125,10 +125,7 @@ export const getVideo: RequestHandler = async (req, res) => {
       });
     }
 
-    const video = await Video.findById(id).populate(
-      "userId",
-      "username email role",
-    );
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
