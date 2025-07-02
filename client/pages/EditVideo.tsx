@@ -741,6 +741,82 @@ export default function EditVideo() {
           </div>
         </div>
 
+        {/* Chapter Management */}
+        {editMode === "chapters" && (
+          <div className="bg-white rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Chapter Management
+              </h2>
+              <Button
+                onClick={addChapter}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={!duration}
+              >
+                Add Chapter at Current Time
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {chapters.map((chapter, index) => (
+                <div
+                  key={chapter.id}
+                  className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                >
+                  <div className="flex-shrink-0 w-16">
+                    <span className="text-sm font-medium text-gray-600">
+                      {Math.floor(chapter.startTime)}s -{" "}
+                      {Math.floor(chapter.endTime)}s
+                    </span>
+                  </div>
+
+                  <div className="flex-1">
+                    <Input
+                      value={chapter.title}
+                      onChange={(e) =>
+                        updateChapterTitle(chapter.id, e.target.value)
+                      }
+                      placeholder={generateChapterTitle(index)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => seekToChapter(chapter)}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Go to
+                    </Button>
+
+                    {chapters.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeChapter(chapter.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {chapters.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p>
+                  No chapters yet. Click "Add Chapter" to create your first
+                  chapter.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Accessibility Settings */}
         <div className="bg-white rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">
