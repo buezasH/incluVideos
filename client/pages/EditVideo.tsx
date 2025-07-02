@@ -571,12 +571,12 @@ export default function EditVideo() {
                   : "Trim Video"}
             </Button>
             <Button
-              variant={editMode === "split" ? "default" : "outline"}
-              onClick={editMode === "split" ? cancelEdit : startSplitMode}
+              variant={editMode === "chapters" ? "default" : "outline"}
+              onClick={editMode === "chapters" ? cancelEdit : startChapterMode}
               disabled={isProcessing || trimmedVideoUrl}
-              className={editMode === "split" ? "bg-primary text-white" : ""}
+              className={editMode === "chapters" ? "bg-primary text-white" : ""}
             >
-              {editMode === "split" ? "Cancel Split" : "Split Video"}
+              {editMode === "chapters" ? "Cancel Chapters" : "Add Chapters"}
             </Button>
             {editMode && (
               <Button
