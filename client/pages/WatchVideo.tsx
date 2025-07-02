@@ -75,6 +75,20 @@ export default function WatchVideo() {
   const [video, setVideo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [chapters, setChapters] = useState<
+    {
+      id: string;
+      title: string;
+      startTime: number;
+      endTime: number;
+    }[]
+  >([]);
+  const [currentChapter, setCurrentChapter] = useState<{
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+  } | null>(null);
 
   // Load video data
   useEffect(() => {
