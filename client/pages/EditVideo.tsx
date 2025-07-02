@@ -670,19 +670,28 @@ export default function EditVideo() {
                 </>
               )}
 
-              {/* Split point indicator */}
-              {editMode === "split" && duration > 0 && (
-                <div
-                  className="absolute top-0 bottom-0 w-1 bg-red-500"
-                  style={{
-                    left: `${Math.max(0, Math.min(100, (splitPoint / duration) * 100))}%`,
-                  }}
-                >
-                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                    <Scissors className="h-4 w-4 text-red-500" />
-                  </div>
-                </div>
-              )}
+              {/* Chapter indicators */}
+              {chapters.length > 0 &&
+                duration > 0 &&
+                chapters.map((chapter, index) => (
+                  <React.Fragment key={chapter.id}>
+                    {/* Chapter divider (except for first chapter) */}
+                    {index > 0 && (
+                      <div
+                        className="absolute top-0 bottom-0 w-1 bg-blue-500 cursor-pointer hover:bg-blue-600"
+                        style={{
+                          left: `${Math.max(0, Math.min(100, (chapter.startTime / duration) * 100))}%`,
+                        }}
+                        onClick={() => seekToChapter(chapter)}
+                        title={`Chapter ${index + 1}: ${chapter.title}`}
+                      >
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
+                        </div>
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
 
               {/* Current time indicator */}
               <div
