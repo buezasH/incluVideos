@@ -24,14 +24,6 @@ export function Header() {
         <Button variant="ghost" size="sm">
           <User className="h-5 w-5" />
         </Button>
-
-        <Avatar className="h-8 w-8">
-          <AvatarImage
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
-            alt="User"
-          />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
       </div>
     </header>
   );
