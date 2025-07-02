@@ -147,7 +147,10 @@ export const getVideo: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      video: video.toJSON(),
+      video: {
+        ...video.toJSON(),
+        userId: video.userId.toString(), // Ensure userId is a string
+      },
     });
   } catch (error) {
     console.error("❌ Get video error:", error);
