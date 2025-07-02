@@ -387,6 +387,14 @@ export default function EditVideo() {
     if (editMode === "trim") {
       trimVideo();
     } else if (editMode === "chapters") {
+      // Validate chapters before saving
+      const errors = validateChapters(chapters);
+      if (Object.keys(errors).length > 0) {
+        setChapterErrors(errors);
+        alert("Please fix chapter errors before saving.");
+        return;
+      }
+
       // Save chapters to upload data
       setUploadData((prev) => ({
         ...prev,
