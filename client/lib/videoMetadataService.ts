@@ -139,6 +139,43 @@ export const createVideoMetadata = async (
 /**
  * Get video metadata by ID
  */
+// Robust fetch wrapper that handles network issues
+const robustFetch = async (
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> => {
+  // Add default timeout and error handling
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      // Add additional headers for better compatibility
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+
+    // Handle different types of network errors
+    if (error.name === "AbortError") {
+      throw new Error("Request timeout - server may be slow");
+    } else if (error.message.includes("Failed to fetch")) {
+      throw new Error("Network connection failed - check internet connection");
+    } else {
+      throw error;
+    }
+  }
+};
+
 export const getVideoMetadata = async (id: string): Promise<VideoMetadata> => {
   // Retry logic for fetch failures
   const maxRetries = 3;
@@ -152,15 +189,10 @@ export const getVideoMetadata = async (id: string): Promise<VideoMetadata> => {
       const headers = getAuthHeaders();
       console.log("📤 Request headers:", headers);
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
-      const response = await fetch(`/api/videos/${id}`, {
+      const response = await robustFetch(`/api/videos/${id}`, {
         headers,
-        signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
       console.log("📥 Response status:", response.status, response.statusText);
 
       if (!response.ok) {
