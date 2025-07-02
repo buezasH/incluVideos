@@ -13,6 +13,8 @@ import {
   MoreHorizontal,
   Share,
   Subtitles,
+  ChevronDown,
+  BookOpen,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
