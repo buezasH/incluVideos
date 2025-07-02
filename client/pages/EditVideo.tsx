@@ -801,50 +801,112 @@ export default function EditVideo() {
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {chapters.map((chapter, index) => (
                 <div
                   key={chapter.id}
-                  className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                  className={`p-4 rounded-lg border ${chapterErrors[chapter.id] ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"}`}
                 >
-                  <div className="flex-shrink-0 w-16">
-                    <span className="text-sm font-medium text-gray-600">
-                      {Math.floor(chapter.startTime)}s -{" "}
-                      {Math.floor(chapter.endTime)}s
-                    </span>
-                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-1 space-y-3">
+                      {/* Chapter Title */}
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Chapter Title
+                        </Label>
+                        <Input
+                          value={chapter.title}
+                          onChange={(e) =>
+                            updateChapterTitle(chapter.id, e.target.value)
+                          }
+                          placeholder={generateChapterTitle(index)}
+                          className="mt-1"
+                        />
+                      </div>
 
-                  <div className="flex-1">
-                    <Input
-                      value={chapter.title}
-                      onChange={(e) =>
-                        updateChapterTitle(chapter.id, e.target.value)
-                      }
-                      placeholder={generateChapterTitle(index)}
-                      className="w-full"
-                    />
-                  </div>
+                      {/* Time Inputs */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">
+                            Start Time (seconds)
+                          </Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={duration}
+                            step="0.1"
+                            value={chapter.startTime}
+                            onChange={(e) =>
+                              updateChapterTime(
+                                chapter.id,
+                                "startTime",
+                                parseFloat(e.target.value) || 0,
+                              )
+                            }
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">
+                            End Time (seconds)
+                          </Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={duration}
+                            step="0.1"
+                            value={chapter.endTime}
+                            onChange={(e) =>
+                              updateChapterTime(
+                                chapter.id,
+                                "endTime",
+                                parseFloat(e.target.value) || 0,
+                              )
+                            }
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => seekToChapter(chapter)}
-                      className="text-blue-600 hover:text-blue-700"
-                    >
-                      Go to
-                    </Button>
+                      {/* Error Message */}
+                      {chapterErrors[chapter.id] && (
+                        <div className="text-sm text-red-600 bg-red-100 px-3 py-2 rounded">
+                          ⚠️ {chapterErrors[chapter.id]}
+                        </div>
+                      )}
+                    </div>
 
-                    {chapters.length > 1 && (
+                    {/* Action Buttons */}
+                    <div className="flex flex-col space-y-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => removeChapter(chapter.id)}
-                        className="text-red-600 hover:text-red-700"
+                        onClick={() => seekToChapter(chapter)}
+                        className="text-blue-600 hover:text-blue-700"
                       >
-                        Remove
+                        Go to Start
                       </Button>
-                    )}
+
+                      {chapters.length > 1 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeChapter(chapter.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Chapter Duration */}
+                  <div className="mt-2 text-sm text-gray-600">
+                    Duration:{" "}
+                    {Math.max(0, chapter.endTime - chapter.startTime).toFixed(
+                      1,
+                    )}{" "}
+                    seconds
                   </div>
                 </div>
               ))}
