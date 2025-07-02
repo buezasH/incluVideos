@@ -19,6 +19,12 @@ export interface IVideo extends mongoose.Document {
     trimEnd: number;
     trimmedDuration: number;
   };
+  chapters?: {
+    id: string;
+    title: string;
+    startTime: number;
+    endTime: number;
+  }[];
   uploadedAt: Date;
   lastEditedAt?: Date;
   views: number;
