@@ -919,6 +919,60 @@ export default function WatchVideo() {
             </div>
           </div>
         </div>
+
+        {/* Chapters List */}
+        {chapters.length > 0 && (
+          <div className="bg-white rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <BookOpen className="h-5 w-5 mr-2" />
+              Chapters ({chapters.length})
+            </h2>
+            <div className="space-y-2">
+              {chapters.map((chapter, index) => (
+                <div
+                  key={chapter.id}
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                    currentChapter?.id === chapter.id
+                      ? "bg-primary/10 border border-primary/20"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }`}
+                  onClick={() => jumpToChapter(chapter)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        currentChapter?.id === chapter.id
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {chapter.title}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {formatTime(chapter.startTime)} -{" "}
+                        {formatTime(chapter.endTime)}
+                        <span className="ml-2">
+                          ({formatTime(chapter.endTime - chapter.startTime)}{" "}
+                          duration)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {currentChapter?.id === chapter.id && (
+                    <div className="text-primary">
+                      <Play className="h-4 w-4 fill-current" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
