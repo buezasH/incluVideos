@@ -772,8 +772,7 @@ export default function EditVideo() {
               )}
               {editMode === "chapters" && (
                 <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded">
-                  Chapter Mode: Click timeline to add new chapter at current
-                  time
+                  Chapter Mode: Add chapters manually with start and end times
                 </div>
               )}
               {!editMode && !trimmedVideoUrl && !isProcessing && (
