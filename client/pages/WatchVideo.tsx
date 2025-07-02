@@ -721,6 +721,27 @@ export default function WatchVideo() {
                   >
                     <SkipBack className="h-5 w-5" />
                   </Button>
+
+                  {/* Chapter Navigation */}
+                  {chapters.length > 0 && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20"
+                        onClick={() => {
+                          const prevChapter = getPreviousChapter();
+                          if (prevChapter) jumpToChapter(prevChapter);
+                        }}
+                        disabled={!getPreviousChapter()}
+                        title="Previous Chapter"
+                      >
+                        <SkipBack className="h-4 w-4" />
+                        <span className="text-xs">CH</span>
+                      </Button>
+                    </>
+                  )}
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -733,6 +754,27 @@ export default function WatchVideo() {
                       <Play className="h-6 w-6" />
                     )}
                   </Button>
+
+                  {/* Chapter Navigation */}
+                  {chapters.length > 0 && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20"
+                        onClick={() => {
+                          const nextChapter = getNextChapter();
+                          if (nextChapter) jumpToChapter(nextChapter);
+                        }}
+                        disabled={!getNextChapter()}
+                        title="Next Chapter"
+                      >
+                        <span className="text-xs">CH</span>
+                        <SkipForward className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+
                   <Button
                     variant="ghost"
                     size="icon"
