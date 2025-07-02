@@ -297,6 +297,7 @@ export const updateVideo: RequestHandler = async (req, res) => {
       "description",
       "category",
       "tags",
+      "chapters",
       "isPublic",
       "accessibilityFeatures",
       "finalDuration",
