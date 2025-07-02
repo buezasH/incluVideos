@@ -5,11 +5,14 @@ import {
   Play,
   Pause,
   Volume2,
+  VolumeX,
+  Volume1,
   Maximize,
   SkipBack,
   SkipForward,
   MoreHorizontal,
   Share,
+  Subtitles,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -67,6 +70,8 @@ export default function WatchVideo() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [video, setVideo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -628,18 +633,64 @@ export default function WatchVideo() {
                   >
                     <SkipForward className="h-5 w-5" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-white/20"
-                    onClick={() => {
-                      const newVolume = volume > 0 ? 0 : 1;
-                      setVolume(newVolume);
-                      if (videoRef.current) videoRef.current.volume = newVolume;
-                    }}
+                  {/* Volume Control */}
+                  <div
+                    className="flex items-center space-x-2"
+                    onMouseEnter={() => setShowVolumeSlider(true)}
+                    onMouseLeave={() => setShowVolumeSlider(false)}
                   >
-                    <Volume2 className="h-5 w-5" />
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-white/20"
+                      onClick={() => {
+                        const newMuted = !isMuted;
+                        setIsMuted(newMuted);
+                        if (videoRef.current) {
+                          videoRef.current.muted = newMuted;
+                        }
+                      }}
+                    >
+                      {isMuted || volume === 0 ? (
+                        <VolumeX className="h-5 w-5" />
+                      ) : volume < 0.5 ? (
+                        <Volume1 className="h-5 w-5" />
+                      ) : (
+                        <Volume2 className="h-5 w-5" />
+                      )}
+                    </Button>
+
+                    {/* Volume Slider */}
+                    {showVolumeSlider && (
+                      <div className="flex items-center bg-black/40 rounded px-2 py-1">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={isMuted ? 0 : volume}
+                          onChange={(e) => {
+                            const newVolume = parseFloat(e.target.value);
+                            setVolume(newVolume);
+                            setIsMuted(newVolume === 0);
+                            if (videoRef.current) {
+                              videoRef.current.volume = newVolume;
+                              videoRef.current.muted = newVolume === 0;
+                            }
+                          }}
+                          className="w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer
+                            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
+                            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white
+                            [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-sm
+                            [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full
+                            [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
+                        />
+                        <span className="text-xs ml-2 min-w-[2rem]">
+                          {Math.round((isMuted ? 0 : volume) * 100)}%
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <span className="text-sm">
                     {formatTime(currentTime)} / {formatTime(duration)}
                   </span>
@@ -650,7 +701,20 @@ export default function WatchVideo() {
                     variant="ghost"
                     size="icon"
                     className="text-white hover:bg-white/20"
+                    onClick={() => {
+                      // TODO: Implement subtitles toggle functionality
+                      console.log("Subtitles toggle clicked");
+                    }}
+                    title="Toggle Subtitles"
+                  >
+                    <Subtitles className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20"
                     onClick={toggleFullscreen}
+                    title="Toggle Fullscreen"
                   >
                     <Maximize className="h-5 w-5" />
                   </Button>
