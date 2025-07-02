@@ -513,18 +513,47 @@ export default function WatchVideo() {
                 ? "There was an issue loading the video. This might be due to network connectivity or the video file location."
                 : "The video you're looking for could not be found."}
             </p>
+
+            {/* Show available sample videos if main video not found */}
+            {!video && !error?.includes("Loading video data") && (
+              <div className="mb-6">
+                <p className="text-sm text-gray-500 mb-3">
+                  Try these available videos:
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={() => (window.location.href = "/watch/1")}
+                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200"
+                  >
+                    Sample Video 1
+                  </button>
+                  <button
+                    onClick={() => (window.location.href = "/watch/2")}
+                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200"
+                  >
+                    Sample Video 2
+                  </button>
+                  <button
+                    onClick={() => (window.location.href = "/")}
+                    className="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200"
+                  >
+                    Browse All Videos
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-3 justify-center">
-              {video && (
-                <button
-                  onClick={() => {
-                    setError("");
-                    window.location.reload();
-                  }}
-                  className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-                >
-                  Retry
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setError("");
+                  setLoading(true);
+                  window.location.reload();
+                }}
+                className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+              >
+                Retry
+              </button>
               <button
                 onClick={() => window.history.back()}
                 className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
