@@ -127,6 +127,29 @@ const videoSchema = new mongoose.Schema(
         min: 0,
       },
     },
+    chapters: [
+      {
+        id: {
+          type: String,
+          required: true,
+        },
+        title: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        startTime: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        endTime: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+      },
+    ],
     uploadedAt: {
       type: Date,
       default: Date.now,
