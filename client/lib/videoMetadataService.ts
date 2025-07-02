@@ -177,6 +177,18 @@ const robustFetch = async (
 };
 
 export const getVideoMetadata = async (id: string): Promise<VideoMetadata> => {
+  // Validate ID format before making requests
+  if (!id || typeof id !== "string") {
+    throw new Error("Video ID is required and must be a string");
+  }
+
+  // Check if ID looks like a MongoDB ObjectId (24 character hex string)
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    throw new Error(
+      `Invalid video ID format: "${id}". Expected 24-character hexadecimal string.`,
+    );
+  }
+
   // Retry logic for fetch failures
   const maxRetries = 3;
   let lastError: Error;
