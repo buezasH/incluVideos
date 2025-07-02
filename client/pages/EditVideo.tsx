@@ -223,13 +223,71 @@ export default function EditVideo() {
     setTrimEnd(duration);
   };
 
-  const startSplitMode = () => {
-    setEditMode("split");
-    setSplitPoint(currentTime);
+  const startChapterMode = () => {
+    setEditMode("chapters");
   };
 
   const cancelEdit = () => {
     setEditMode(null);
+  };
+
+  const generateChapterTitle = (index: number) => `Chapter ${index + 1}`;
+
+  const addChapter = () => {
+    if (chapters.length === 0) return;
+
+    const newChapter = {
+      id: `chapter-${Date.now()}`,
+      title: generateChapterTitle(chapters.length),
+      startTime: currentTime,
+      endTime: duration,
+    };
+
+    // Update the previous chapter's end time
+    const updatedChapters = [...chapters];
+    if (updatedChapters.length > 0) {
+      updatedChapters[updatedChapters.length - 1].endTime = currentTime;
+    }
+
+    updatedChapters.push(newChapter);
+    setChapters(updatedChapters);
+  };
+
+  const removeChapter = (chapterId: string) => {
+    if (chapters.length <= 1) return; // Don't allow removing the last chapter
+
+    const updatedChapters = chapters.filter(
+      (chapter) => chapter.id !== chapterId,
+    );
+
+    // Adjust the remaining chapters to fill the gaps
+    for (let i = 0; i < updatedChapters.length; i++) {
+      if (i === 0) {
+        updatedChapters[i].startTime = 0;
+      } else {
+        updatedChapters[i].startTime = updatedChapters[i - 1].endTime;
+      }
+
+      if (i === updatedChapters.length - 1) {
+        updatedChapters[i].endTime = duration;
+      }
+    }
+
+    setChapters(updatedChapters);
+  };
+
+  const updateChapterTitle = (chapterId: string, title: string) => {
+    const updatedChapters = chapters.map((chapter) =>
+      chapter.id === chapterId ? { ...chapter, title } : chapter,
+    );
+    setChapters(updatedChapters);
+  };
+
+  const seekToChapter = (chapter: { startTime: number }) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = chapter.startTime;
+      setCurrentTime(chapter.startTime);
+    }
   };
 
   const trimVideo = async () => {
