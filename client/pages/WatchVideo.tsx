@@ -652,11 +652,47 @@ export default function WatchVideo() {
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
               {/* Progress Bar */}
               <div
-                className="w-full bg-white/20 rounded-full h-1 mb-4 cursor-pointer"
+                className="w-full bg-white/20 rounded-full h-1 mb-4 cursor-pointer relative"
                 onClick={handleProgressClick}
               >
+                {/* Chapter markers */}
+                {chapters.length > 0 &&
+                  duration > 0 &&
+                  chapters.map((chapter, index) => (
+                    <React.Fragment key={chapter.id}>
+                      {/* Chapter start marker (except for first chapter) */}
+                      {index > 0 && (
+                        <div
+                          className="absolute top-0 w-0.5 h-full bg-white/60 cursor-pointer hover:bg-white z-10"
+                          style={{
+                            left: `${Math.max(0, Math.min(100, (chapter.startTime / duration) * 100))}%`,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            jumpToChapter(chapter);
+                          }}
+                          title={`Jump to: ${chapter.title}`}
+                        />
+                      )}
+
+                      {/* Chapter background color */}
+                      <div
+                        className={`absolute top-0 h-full rounded-full ${
+                          currentChapter?.id === chapter.id
+                            ? "bg-blue-400/30"
+                            : "bg-white/10"
+                        }`}
+                        style={{
+                          left: `${Math.max(0, Math.min(100, (chapter.startTime / duration) * 100))}%`,
+                          width: `${Math.max(0, Math.min(100, ((chapter.endTime - chapter.startTime) / duration) * 100))}%`,
+                        }}
+                      />
+                    </React.Fragment>
+                  ))}
+
+                {/* Progress indicator */}
                 <div
-                  className="bg-primary h-1 rounded-full transition-all"
+                  className="bg-primary h-1 rounded-full transition-all relative z-20"
                   style={{
                     width: duration
                       ? `${(currentTime / duration) * 100}%`
