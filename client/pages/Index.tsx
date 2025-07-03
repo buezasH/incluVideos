@@ -171,18 +171,8 @@ export default function Index() {
         </div>
 
         {error && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <div className="text-yellow-800 text-sm">
-              ⚠️ {error}. Showing sample videos instead.
-            </div>
-          </div>
-        )}
-
-        {!loading && mongoVideos.length === 0 && !error && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div className="text-blue-800 text-sm">
-              📱 Showing sample videos. Upload your own videos to see them here!
-            </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="text-red-800 text-sm">⚠️ {error}</div>
           </div>
         )}
 
