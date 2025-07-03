@@ -124,6 +124,100 @@ export default function Index() {
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
+  // Function to get thumbnail URL for MongoDB videos
+  const getVideoThumbnail = (video: VideoMetadata) => {
+    return (
+      video.thumbnailUrl ||
+      "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=300&fit=crop"
+    );
+  };
+
+  // Function to categorize MongoDB videos into sections
+  const createVideoSections = () => {
+    if (mongoVideos.length === 0) {
+      return videoSections; // Fall back to sample videos if no MongoDB videos
+    }
+
+    const sections = [
+      {
+        title: "Daily Routines",
+        videos: mongoVideos
+          .filter(
+            (video) =>
+              video.category === "daily-living" ||
+              video.tags.some((tag) =>
+                [
+                  "routine",
+                  "daily",
+                  "morning",
+                  "hygiene",
+                  "breakfast",
+                ].includes(tag.toLowerCase()),
+              ),
+          )
+          .slice(0, 6)
+          .map((video) => ({
+            id: video.id,
+            title: video.title,
+            description: video.description,
+            thumbnail: getVideoThumbnail(video),
+            duration: formatDuration(video.finalDuration),
+          })),
+      },
+      {
+        title: "Understanding Emotions",
+        videos: mongoVideos
+          .filter(
+            (video) =>
+              video.category === "social-skills" ||
+              video.tags.some((tag) =>
+                ["emotion", "feelings", "social", "communication"].includes(
+                  tag.toLowerCase(),
+                ),
+              ),
+          )
+          .slice(0, 6)
+          .map((video) => ({
+            id: video.id,
+            title: video.title,
+            description: video.description,
+            thumbnail: getVideoThumbnail(video),
+            duration: formatDuration(video.finalDuration),
+          })),
+      },
+    ];
+
+    // If we don't have enough videos in specific categories, add a general section
+    const remainingVideos = mongoVideos
+      .filter(
+        (video) =>
+          !sections.some((section) =>
+            section.videos.some((v) => v.id === video.id),
+          ),
+      )
+      .slice(0, 6)
+      .map((video) => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        thumbnail: getVideoThumbnail(video),
+        duration: formatDuration(video.finalDuration),
+      }));
+
+    if (remainingVideos.length > 0) {
+      sections.push({
+        title: "Latest Videos",
+        videos: remainingVideos,
+      });
+    }
+
+    // Filter out empty sections and ensure we have fallback
+    const nonEmptySections = sections.filter(
+      (section) => section.videos.length > 0,
+    );
+    return nonEmptySections.length > 0 ? nonEmptySections : videoSections;
+  };
+
   return (
     <Layout>
       <div className="p-6">
