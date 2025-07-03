@@ -740,21 +740,35 @@ export default function WatchVideo() {
                   console.error(
                     `📝 Error Details: ${errorMessage} - ${debugInfo}`,
                   );
-                  setError(`${errorMessage}. ${debugInfo}`);
 
-                  // Run connectivity test for R2 videos
+                  // For R2 videos that fail to load, fallback to sample video
                   if (
                     video &&
                     (video.videoUrl.includes("r2.cloudflarestorage.com") ||
                       video.videoUrl.includes(".r2.dev"))
                   ) {
                     console.log(
-                      "🔍 Video failed to load, running comprehensive debugging...",
+                      "🔍 R2 video failed to load, attempting fallback to sample video...",
                     );
+
+                    // Use the first sample video as fallback
+                    const fallbackVideo = videoData[1];
+                    if (fallbackVideo) {
+                      console.log("🔄 Switching to sample video fallback");
+                      setVideo(fallbackVideo);
+                      setChapters(fallbackVideo.chapters || []);
+                      setError(
+                        "Note: Using sample video due to loading issues with the original content.",
+                      );
+                      return; // Exit early to prevent further error processing
+                    }
+
                     runConnectivityTest(video.videoUrl);
                     logCorsDebugInfo();
                     testCorsHeaders(video.videoUrl);
                   }
+
+                  setError(`${errorMessage}. ${debugInfo}`);
                 } else {
                   setError("Unknown video loading error");
                 }
