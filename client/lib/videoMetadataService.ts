@@ -264,36 +264,68 @@ export const getVideos = async (params?: {
   search?: string;
   myVideos?: boolean;
 }): Promise<VideoListResponse> => {
-  try {
-    const searchParams = new URLSearchParams();
+  // Retry logic for fetch failures
+  const maxRetries = 2; // Fewer retries for list requests
+  let lastError: Error;
 
-    if (params?.page) searchParams.append("page", params.page.toString());
-    if (params?.limit) searchParams.append("limit", params.limit.toString());
-    if (params?.category) searchParams.append("category", params.category);
-    if (params?.tags)
-      params.tags.forEach((tag) => searchParams.append("tags", tag));
-    if (params?.userId) searchParams.append("userId", params.userId);
-    if (params?.search) searchParams.append("search", params.search);
-    if (params?.myVideos) searchParams.append("myVideos", "true");
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔍 Fetching videos list (attempt ${attempt}/${maxRetries})`);
 
-    const response = await fetch(`/api/videos?${searchParams.toString()}`, {
-      headers: getAuthHeaders(),
-    });
+      const searchParams = new URLSearchParams();
 
-    if (!response.ok) {
-      let errorMessage = `Failed to get videos: ${response.status} ${response.statusText}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch {}
-      throw new Error(errorMessage);
+      if (params?.page) searchParams.append("page", params.page.toString());
+      if (params?.limit) searchParams.append("limit", params.limit.toString());
+      if (params?.category) searchParams.append("category", params.category);
+      if (params?.tags)
+        params.tags.forEach((tag) => searchParams.append("tags", tag));
+      if (params?.userId) searchParams.append("userId", params.userId);
+      if (params?.search) searchParams.append("search", params.search);
+      if (params?.myVideos) searchParams.append("myVideos", "true");
+
+      const response = await robustFetch(
+        `/api/videos?${searchParams.toString()}`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
+
+      if (!response.ok) {
+        let errorMessage = `Failed to get videos: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {}
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("✅ Videos list loaded:", data.videos?.length || 0);
+      return data;
+    } catch (error: any) {
+      lastError = error;
+      console.error(`Get videos error (attempt ${attempt}):`, error);
+
+      // Check if it's a network error
+      if (
+        error instanceof TypeError &&
+        error.message.includes("Failed to fetch")
+      ) {
+        console.error("🌐 Network error loading videos list");
+      } else if (error.message?.includes("timeout")) {
+        console.error("⏱️ Request timeout loading videos");
+      }
+
+      // If this isn't the last attempt, wait before retrying
+      if (attempt < maxRetries) {
+        const delay = attempt * 1000; // Progressive delay: 1s, 2s
+        console.log(`⏳ Waiting ${delay}ms before retry...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Get videos error:", error);
-    throw error;
   }
+
+  throw lastError!;
 };
 
 /**
