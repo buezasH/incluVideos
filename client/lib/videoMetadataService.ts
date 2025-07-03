@@ -120,6 +120,7 @@ export const createVideoMetadata = async (
       console.log(
         `🔄 Creating video metadata (attempt ${attempt}/${maxRetries})`,
       );
+      console.log("📤 Request payload:", JSON.stringify(videoData, null, 2));
 
       const response = await robustFetch("/api/videos", {
         method: "POST",
@@ -129,16 +130,41 @@ export const createVideoMetadata = async (
 
       if (!response.ok) {
         let errorMessage = `Failed to create video: ${response.status} ${response.statusText}`;
+        let errorData = null;
+
+        // Clone response to avoid "body stream already read" error
+        const responseClone = response.clone();
+
         try {
-          const errorData = await response.json();
+          errorData = await response.json();
           console.error("❌ Server error response:", errorData);
-          errorMessage = errorData.message || errorMessage;
+          if (errorData && errorData.message) {
+            errorMessage = errorData.message;
+          }
         } catch (parseError) {
-          console.error("❌ Could not parse error response:", parseError);
+          console.error("❌ Could not parse error response, trying text...");
+          try {
+            const errorText = await responseClone.text();
+            console.error("❌ Error response text:", errorText);
+            if (errorText) {
+              errorMessage += ` - ${errorText}`;
+            }
+          } catch (textError) {
+            console.error(
+              "❌ Could not parse error response as text:",
+              textError,
+            );
+          }
         }
 
         // For 400 errors, provide more specific guidance
         if (response.status === 400) {
+          console.error("🔍 400 Error Analysis:");
+          console.error(
+            "   - Check required fields: title, description, videoUrl, r2VideoKey",
+          );
+          console.error("   - Verify data types and formats");
+          console.error("   - Check authentication token");
           errorMessage +=
             ". Please check that all required fields are filled correctly.";
         } else if (response.status === 401) {
