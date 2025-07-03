@@ -529,17 +529,41 @@ export default function EditVideo() {
     } catch (error) {
       console.error("Upload error:", error);
 
-      // More user-friendly error messages
+      // More user-friendly error messages with specific guidance
       let errorMessage = "Upload failed. ";
       if (error instanceof Error) {
         if (error.message.includes("Failed to fetch")) {
-          errorMessage +=
-            "Using local storage instead of cloud storage. Your video is saved locally and you can continue editing.";
+          errorMessage =
+            "Connection failed. Please check your internet connection and try again. Your video editing progress has been saved locally.";
+        } else if (error.message.includes("400")) {
+          errorMessage =
+            "Invalid video data. Please check that all fields are filled correctly and try again.";
+        } else if (
+          error.message.includes("401") ||
+          error.message.includes("Authentication")
+        ) {
+          errorMessage =
+            "You need to log in again to upload videos. Please refresh the page and log in.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage =
+            "Upload is taking too long. Please check your connection and try again.";
+        } else if (error.message.includes("Server error")) {
+          errorMessage =
+            "Server is temporarily unavailable. Please try again in a few minutes.";
         } else {
           errorMessage += error.message;
         }
       } else {
-        errorMessage += "Unknown error occurred.";
+        errorMessage += "Unknown error occurred. Please try again.";
+      }
+
+      // Show user-friendly error dialog
+      if (confirm(`${errorMessage}\n\nWould you like to retry the upload?`)) {
+        // Retry upload after a short delay
+        setTimeout(() => {
+          handleUploadVideo();
+        }, 2000);
+        return;
       }
 
       alert(errorMessage);
