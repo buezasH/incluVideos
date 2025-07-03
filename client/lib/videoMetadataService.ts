@@ -112,28 +112,74 @@ const getAuthHeaders = (): HeadersInit => {
 export const createVideoMetadata = async (
   videoData: CreateVideoData,
 ): Promise<VideoMetadata> => {
-  try {
-    const response = await fetch("/api/videos", {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(videoData),
-    });
+  const maxRetries = 2;
+  let lastError: Error;
 
-    if (!response.ok) {
-      let errorMessage = `Failed to create video: ${response.status} ${response.statusText}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch {}
-      throw new Error(errorMessage);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(
+        `🔄 Creating video metadata (attempt ${attempt}/${maxRetries})`,
+      );
+
+      const response = await robustFetch("/api/videos", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(videoData),
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Failed to create video: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          console.error("❌ Server error response:", errorData);
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          console.error("❌ Could not parse error response:", parseError);
+        }
+
+        // For 400 errors, provide more specific guidance
+        if (response.status === 400) {
+          errorMessage +=
+            ". Please check that all required fields are filled correctly.";
+        } else if (response.status === 401) {
+          errorMessage = "Authentication required. Please log in again.";
+        } else if (response.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("✅ Video metadata created successfully:", data.video?.id);
+      return data.video;
+    } catch (error: any) {
+      lastError = error;
+      console.error(`Create video metadata error (attempt ${attempt}):`, error);
+
+      // Check if it's a network error
+      if (
+        error instanceof TypeError &&
+        error.message.includes("Failed to fetch")
+      ) {
+        console.error("🌐 Network error creating video metadata");
+        error.message =
+          "Unable to save video to cloud database. Check your internet connection.";
+      } else if (error.message?.includes("timeout")) {
+        console.error("⏱️ Request timeout creating video");
+        error.message = "Request timed out. The server may be busy.";
+      }
+
+      // If this isn't the last attempt, wait before retrying
+      if (attempt < maxRetries) {
+        const delay = attempt * 1500; // Progressive delay: 1.5s, 3s
+        console.log(`⏳ Waiting ${delay}ms before retry...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
     }
-
-    const data = await response.json();
-    return data.video;
-  } catch (error) {
-    console.error("Create video metadata error:", error);
-    throw error;
   }
+
+  throw lastError!;
 };
 
 /**
