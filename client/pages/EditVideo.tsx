@@ -634,6 +634,29 @@ export default function EditVideo() {
               className="w-full h-96 object-cover"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
+              onTimeUpdate={() => {
+                const video = videoRef.current;
+                if (!video) return;
+
+                // If we have a trimmed video, enforce boundaries
+                if (uploadData?.trimMetadata) {
+                  const { trimStart, trimEnd } = uploadData.trimMetadata;
+                  const actualTime = video.currentTime;
+
+                  if (actualTime < trimStart) {
+                    video.currentTime = trimStart;
+                  } else if (actualTime >= trimEnd) {
+                    video.currentTime = trimStart;
+                    video.pause();
+                    setIsPlaying(false);
+                  }
+
+                  // Set relative time for display (0 to trimmed duration)
+                  setCurrentTime(Math.max(0, actualTime - trimStart));
+                } else {
+                  setCurrentTime(video.currentTime);
+                }
+              }}
             />
             <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
               <Button
