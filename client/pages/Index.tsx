@@ -6,72 +6,7 @@ import { useState, useEffect } from "react";
 import { getVideos } from "@/lib/videoMetadataService";
 import type { VideoMetadata } from "@/lib/videoMetadataService";
 
-const videoSections = [
-  {
-    title: "Daily Routines",
-    videos: [
-      {
-        id: 1,
-        title: "Getting Ready for School",
-        description:
-          "Learn how to start your day with confidence - wake up, brush your teeth, and pack your bag.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=300&fit=crop",
-        duration: "3:45",
-      },
-      {
-        id: 2,
-        title: "Morning Hygiene Steps",
-        description:
-          "Learn the essential steps of brushing, washing, and staying fresh before starting your school day properly.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-        duration: "2:30",
-      },
-      {
-        id: 3,
-        title: "Making Your Bed",
-        description:
-          "Discover how to straighten your blanket and pillows to keep your room neat every morning.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-        duration: "1:15",
-      },
-    ],
-  },
-  {
-    title: "Understanding Emotions",
-    videos: [
-      {
-        id: 4,
-        title: "Recognizing Feelings",
-        description:
-          "Explore different facial expressions and body language to understand how emotions like happy, sad and angry.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop",
-        duration: "4:20",
-      },
-      {
-        id: 5,
-        title: "Calming Techniques",
-        description:
-          "Learn easy breathing and stretching routines to stay calm when you feel anxious, upset, or stressed.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop",
-        duration: "5:10",
-      },
-      {
-        id: 6,
-        title: "Talking About Emotions",
-        description:
-          "Practice simple ways to express feelings using words, colors, or hand signals in everyday situations.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=300&fit=crop",
-        duration: "3:55",
-      },
-    ],
-  },
-];
+// Removed sample video sections - only show real videos from MongoDB
 
 export default function Index() {
   const navigate = useNavigate();
