@@ -112,42 +112,53 @@ const getAuthHeaders = (): HeadersInit => {
 export const createVideoMetadata = async (
   videoData: CreateVideoData,
 ): Promise<VideoMetadata> => {
-  // Validate required fields before sending
-  const requiredFields = [
-    "title",
-    "description",
-    "videoUrl",
-    "r2VideoKey",
-    "duration",
-  ];
-  const missingFields = requiredFields.filter(
-    (field) => !videoData[field as keyof CreateVideoData],
-  );
-
-  if (missingFields.length > 0) {
-    const errorMessage = `Missing required fields: ${missingFields.join(", ")}`;
-    console.error("❌ Validation error:", errorMessage);
-    console.error("📋 Current video data:", videoData);
-    throw new Error(errorMessage);
-  }
-
-  // Validate data types
-  if (typeof videoData.duration !== "number" || videoData.duration <= 0) {
-    throw new Error("Duration must be a positive number");
-  }
-
-  if (typeof videoData.title !== "string" || videoData.title.trim() === "") {
-    throw new Error("Title must be a non-empty string");
+  // Basic validation - only check truly required fields
+  if (
+    !videoData.title ||
+    typeof videoData.title !== "string" ||
+    videoData.title.trim() === ""
+  ) {
+    throw new Error("Title is required and must be a non-empty string");
   }
 
   if (
+    !videoData.description ||
     typeof videoData.description !== "string" ||
     videoData.description.trim() === ""
   ) {
-    throw new Error("Description must be a non-empty string");
+    throw new Error("Description is required and must be a non-empty string");
   }
 
-  console.log("✅ Video data validation passed");
+  // Check description length limit (server has 1000 character limit)
+  if (videoData.description.length > 1000) {
+    throw new Error(
+      `Description is too long (${videoData.description.length} characters). Maximum allowed is 1000 characters.`,
+    );
+  }
+
+  if (!videoData.videoUrl || typeof videoData.videoUrl !== "string") {
+    throw new Error("Video URL is required");
+  }
+
+  if (!videoData.r2VideoKey || typeof videoData.r2VideoKey !== "string") {
+    throw new Error("R2 video key is required");
+  }
+
+  if (
+    !videoData.duration ||
+    typeof videoData.duration !== "number" ||
+    videoData.duration <= 0
+  ) {
+    throw new Error("Duration must be a positive number");
+  }
+
+  console.log("✅ Video data validation passed", {
+    titleLength: videoData.title.length,
+    descriptionLength: videoData.description.length,
+    hasVideoUrl: !!videoData.videoUrl,
+    hasR2Key: !!videoData.r2VideoKey,
+    duration: videoData.duration,
+  });
 
   const maxRetries = 2;
   let lastError: Error;
