@@ -87,6 +87,31 @@ export default function Index() {
       const videos = JSON.parse(storedVideos);
       setUserVideos(videos.slice(0, 6)); // Show only first 6 user videos
     }
+
+    // Load videos from MongoDB
+    const loadMongoVideos = async () => {
+      try {
+        setLoading(true);
+        console.log("🔍 Fetching videos from MongoDB...");
+
+        const response = await getVideos({
+          limit: 20, // Get up to 20 videos
+          page: 1,
+        });
+
+        console.log("✅ Videos loaded:", response.videos.length);
+        setMongoVideos(response.videos);
+        setError("");
+      } catch (error: any) {
+        console.error("❌ Error loading videos:", error);
+        setError("Failed to load videos from database");
+        // Don't show error to user, just fall back to sample videos
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMongoVideos();
   }, []);
 
   const handleVideoClick = (videoId: number | string) => {
