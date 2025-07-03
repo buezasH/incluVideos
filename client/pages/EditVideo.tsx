@@ -515,16 +515,51 @@ export default function EditVideo() {
           },
         };
 
-        // Save metadata to MongoDB
-        const savedVideo = await createVideoMetadata(videoMetadata);
+        // Save metadata to MongoDB with fallback
+        try {
+          const savedVideo = await createVideoMetadata(videoMetadata);
 
-        // Clear upload data for new videos
-        localStorage.removeItem("pendingVideoUpload");
+          // Clear upload data for new videos
+          localStorage.removeItem("pendingVideoUpload");
 
-        console.log(
-          `✅ Video saved to MongoDB: ${savedVideo.title} (${savedVideo.id})`,
-        );
-        navigate(`/watch/${savedVideo.id}`);
+          console.log(
+            `✅ Video saved to MongoDB: ${savedVideo.title} (${savedVideo.id})`,
+          );
+          navigate(`/watch/${savedVideo.id}`);
+        } catch (metadataError) {
+          console.error(
+            "❌ MongoDB save failed, using localStorage fallback:",
+            metadataError,
+          );
+
+          // Save to localStorage as fallback
+          const fallbackVideoId = Date.now().toString();
+          const fallbackVideoData = {
+            ...videoMetadata,
+            id: fallbackVideoId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            views: 0,
+          };
+
+          localStorage.setItem(
+            `video_${fallbackVideoId}`,
+            JSON.stringify(fallbackVideoData),
+          );
+
+          // Clear upload data
+          localStorage.removeItem("pendingVideoUpload");
+
+          console.log(
+            `💾 Video saved locally: ${fallbackVideoData.title} (${fallbackVideoId})`,
+          );
+
+          // Show user the situation but still navigate to watch page
+          alert(
+            "Video uploaded successfully but couldn't sync to cloud database. It's saved locally and you can view it now.",
+          );
+          navigate(`/watch/${fallbackVideoId}`);
+        }
       }
     } catch (error) {
       console.error("Upload error:", error);
