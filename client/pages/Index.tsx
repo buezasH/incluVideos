@@ -126,10 +126,14 @@ export default function Index() {
 
   // Function to get thumbnail URL for MongoDB videos
   const getVideoThumbnail = (video: VideoMetadata) => {
-    return (
-      video.thumbnailUrl ||
-      "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=300&fit=crop"
-    );
+    // Use the real thumbnail from the video metadata
+    if (video.thumbnailUrl) {
+      return video.thumbnailUrl;
+    }
+
+    // If no thumbnail, try to generate one from video URL or use a minimal fallback
+    console.log(`⚠️ No thumbnail found for video: ${video.title}`);
+    return "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=300&fit=crop";
   };
 
   // Function to categorize MongoDB videos into sections
