@@ -88,16 +88,24 @@ export default function Index() {
       setUserVideos(videos.slice(0, 6)); // Show only first 6 user videos
     }
 
-    // Load videos from MongoDB
+    // Load videos from MongoDB with robust error handling
     const loadMongoVideos = async () => {
       try {
         setLoading(true);
         console.log("🔍 Fetching videos from MongoDB...");
 
-        const response = await getVideos({
-          limit: 20, // Get up to 20 videos
-          page: 1,
-        });
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Request timeout")), 5000),
+        );
+
+        const response = (await Promise.race([
+          getVideos({
+            limit: 20, // Get up to 20 videos
+            page: 1,
+          }),
+          timeoutPromise,
+        ])) as any;
 
         console.log("✅ Videos loaded:", response.videos.length);
 
@@ -111,14 +119,33 @@ export default function Index() {
         setError("");
       } catch (error: any) {
         console.error("❌ Error loading videos:", error);
-        setError("Failed to load videos from database");
-        // Don't show error to user, just fall back to sample videos
+
+        // Check error type for better messaging
+        if (error.message?.includes("Failed to fetch")) {
+          console.log("🌐 Network connectivity issue - using sample videos");
+          setError(""); // Don't show error, just use samples
+        } else if (error.message?.includes("timeout")) {
+          console.log("⏱️ Request timeout - using sample videos");
+          setError("");
+        } else {
+          console.log("🔧 Unknown error - using sample videos");
+          setError("");
+        }
+
+        // Ensure we fall back gracefully
+        setMongoVideos([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadMongoVideos();
+    // Only try to load MongoDB videos if we're online
+    if (navigator.onLine) {
+      loadMongoVideos();
+    } else {
+      console.log("📡 Offline - using sample videos only");
+      setLoading(false);
+    }
   }, []);
 
   const handleVideoClick = (videoId: number | string) => {
