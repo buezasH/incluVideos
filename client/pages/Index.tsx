@@ -279,6 +279,14 @@ export default function Index() {
           </div>
         )}
 
+        {!loading && mongoVideos.length === 0 && !error && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="text-blue-800 text-sm">
+              📱 Showing sample videos. Upload your own videos to see them here!
+            </div>
+          </div>
+        )}
+
         <div className="space-y-8">
           {/* User Videos Section */}
           {userVideos.length > 0 && (
