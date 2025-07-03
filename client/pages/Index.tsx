@@ -23,64 +23,31 @@ export default function Index() {
       setUserVideos(videos.slice(0, 6)); // Show only first 6 user videos
     }
 
-    // Load videos from MongoDB with robust error handling
+    // Load videos from MongoDB
     const loadMongoVideos = async () => {
       try {
-        setLoading(true);
         console.log("🔍 Fetching videos from MongoDB...");
 
-        // Add timeout to prevent hanging
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Request timeout")), 5000),
-        );
-
-        const response = (await Promise.race([
-          getVideos({
-            limit: 20, // Get up to 20 videos
-            page: 1,
-          }),
-          timeoutPromise,
-        ])) as any;
-
-        console.log("✅ Videos loaded:", response.videos.length);
-
-        // Debug thumbnail availability
-        response.videos.forEach((video) => {
-          console.log(`📹 Video: ${video.title}`);
-          console.log(`🖼️ Thumbnail: ${video.thumbnailUrl || "NO THUMBNAIL"}`);
+        const response = await getVideos({
+          limit: 20, // Get up to 20 videos
+          page: 1,
         });
 
+        console.log("✅ Videos loaded:", response.videos.length);
         setMongoVideos(response.videos);
         setError("");
       } catch (error: any) {
         console.error("❌ Error loading videos:", error);
-
-        // Check error type for better messaging
-        if (error.message?.includes("Failed to fetch")) {
-          console.log("🌐 Network connectivity issue - using sample videos");
-          setError(""); // Don't show error, just use samples
-        } else if (error.message?.includes("timeout")) {
-          console.log("⏱️ Request timeout - using sample videos");
-          setError("");
-        } else {
-          console.log("🔧 Unknown error - using sample videos");
-          setError("");
-        }
-
-        // Ensure we fall back gracefully
+        setError(
+          "Unable to load videos at the moment. Please try again later.",
+        );
         setMongoVideos([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Only try to load MongoDB videos if we're online
-    if (navigator.onLine) {
-      loadMongoVideos();
-    } else {
-      console.log("📡 Offline - using sample videos only");
-      setLoading(false);
-    }
+    loadMongoVideos();
   }, []);
 
   const handleVideoClick = (videoId: number | string) => {
