@@ -213,11 +213,6 @@ export default function Index() {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-medium text-gray-900">
                   {section.title}
-                  {mongoVideos.length > 0 && (
-                    <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                      {mongoVideos.length > 0 ? "Live" : "Sample"}
-                    </span>
-                  )}
                 </h2>
                 <Button variant="outline" size="sm">
                   View all
