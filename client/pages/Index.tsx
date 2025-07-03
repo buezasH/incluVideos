@@ -234,14 +234,25 @@ export default function Index() {
           ))}
 
           {/* Empty State */}
-          {!loading && mongoVideos.length === 0 && userVideos.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-gray-500 mb-4">
-                No videos available yet. Upload your first video to get started!
+          {!loading &&
+            dynamicVideoSections.length === 0 &&
+            userVideos.length === 0 && (
+              <div className="text-center py-16">
+                <div className="text-gray-400 text-lg mb-6">
+                  Sorry, this is empty
+                </div>
+                <div className="text-gray-500 mb-6">
+                  No videos have been uploaded yet. Be the first to share a
+                  video!
+                </div>
+                <Button
+                  onClick={() => navigate("/upload")}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Upload Your First Video
+                </Button>
               </div>
-              <Button onClick={() => navigate("/upload")}>Upload Video</Button>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </Layout>
