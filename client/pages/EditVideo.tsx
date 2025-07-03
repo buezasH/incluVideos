@@ -484,8 +484,8 @@ export default function EditVideo() {
 
         // Prepare video metadata for MongoDB
         const videoMetadata: CreateVideoData = {
-          title: uploadData.title,
-          description: uploadData.description,
+          title: uploadData.title.trim(),
+          description: uploadData.description.trim().substring(0, 1000), // Enforce 1000 character limit
           category: uploadData.category || "Other",
           tags: uploadData.tags || [],
           videoUrl: videoUploadResult.url,
