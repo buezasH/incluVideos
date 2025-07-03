@@ -100,6 +100,13 @@ export default function Index() {
         });
 
         console.log("✅ Videos loaded:", response.videos.length);
+
+        // Debug thumbnail availability
+        response.videos.forEach((video) => {
+          console.log(`📹 Video: ${video.title}`);
+          console.log(`🖼️ Thumbnail: ${video.thumbnailUrl || "NO THUMBNAIL"}`);
+        });
+
         setMongoVideos(response.videos);
         setError("");
       } catch (error: any) {
