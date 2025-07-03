@@ -259,9 +259,41 @@ export default function WatchVideo() {
                 }
               }
 
+              const videoUrl = getVideoDisplayUrl(videoMetadata);
+
+              // For R2 videos, do a quick accessibility check
+              if (
+                videoUrl.includes("r2.cloudflarestorage.com") ||
+                videoUrl.includes(".r2.dev")
+              ) {
+                console.log("🔍 Checking R2 video accessibility...");
+                try {
+                  const response = await fetch(videoUrl, {
+                    method: "HEAD",
+                    mode: "no-cors",
+                  });
+                  console.log("✅ R2 video appears accessible");
+                } catch (accessError) {
+                  console.log(
+                    "⚠️ R2 video may not be accessible, using fallback",
+                  );
+                  // Use sample video as fallback
+                  const fallbackVideo = videoData[1];
+                  if (fallbackVideo) {
+                    setVideo(fallbackVideo);
+                    setChapters(fallbackVideo.chapters || []);
+                    setError(
+                      "Note: Using sample video due to loading issues with the original content.",
+                    );
+                    setLoading(false);
+                    return;
+                  }
+                }
+              }
+
               const videoData = {
                 ...videoMetadata,
-                videoUrl: getVideoDisplayUrl(videoMetadata),
+                videoUrl: videoUrl,
                 thumbnail: getThumbnailUrl(videoMetadata),
                 author: uploaderInfo,
               };
