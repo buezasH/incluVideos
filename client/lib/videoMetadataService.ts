@@ -112,6 +112,43 @@ const getAuthHeaders = (): HeadersInit => {
 export const createVideoMetadata = async (
   videoData: CreateVideoData,
 ): Promise<VideoMetadata> => {
+  // Validate required fields before sending
+  const requiredFields = [
+    "title",
+    "description",
+    "videoUrl",
+    "r2VideoKey",
+    "duration",
+  ];
+  const missingFields = requiredFields.filter(
+    (field) => !videoData[field as keyof CreateVideoData],
+  );
+
+  if (missingFields.length > 0) {
+    const errorMessage = `Missing required fields: ${missingFields.join(", ")}`;
+    console.error("❌ Validation error:", errorMessage);
+    console.error("📋 Current video data:", videoData);
+    throw new Error(errorMessage);
+  }
+
+  // Validate data types
+  if (typeof videoData.duration !== "number" || videoData.duration <= 0) {
+    throw new Error("Duration must be a positive number");
+  }
+
+  if (typeof videoData.title !== "string" || videoData.title.trim() === "") {
+    throw new Error("Title must be a non-empty string");
+  }
+
+  if (
+    typeof videoData.description !== "string" ||
+    videoData.description.trim() === ""
+  ) {
+    throw new Error("Description must be a non-empty string");
+  }
+
+  console.log("✅ Video data validation passed");
+
   const maxRetries = 2;
   let lastError: Error;
 
