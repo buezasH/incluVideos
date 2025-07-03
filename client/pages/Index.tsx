@@ -3,6 +3,8 @@ import { VideoCard } from "@/components/VideoCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getVideos } from "@/lib/videoMetadataService";
+import type { VideoMetadata } from "@/lib/videoMetadataService";
 
 const videoSections = [
   {
@@ -74,6 +76,9 @@ const videoSections = [
 export default function Index() {
   const navigate = useNavigate();
   const [userVideos, setUserVideos] = useState<any[]>([]);
+  const [mongoVideos, setMongoVideos] = useState<VideoMetadata[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     // Load user videos from localStorage
