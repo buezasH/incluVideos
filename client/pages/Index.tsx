@@ -75,7 +75,7 @@ export default function Index() {
   // Function to categorize MongoDB videos into sections
   const createVideoSections = () => {
     if (mongoVideos.length === 0) {
-      return videoSections; // Fall back to sample videos if no MongoDB videos
+      return []; // Return empty array when no videos
     }
 
     const sections = [
@@ -146,16 +146,13 @@ export default function Index() {
 
     if (remainingVideos.length > 0) {
       sections.push({
-        title: "Latest Videos",
+        title: "All Videos",
         videos: remainingVideos,
       });
     }
 
-    // Filter out empty sections and ensure we have fallback
-    const nonEmptySections = sections.filter(
-      (section) => section.videos.length > 0,
-    );
-    return nonEmptySections.length > 0 ? nonEmptySections : videoSections;
+    // Return only sections that have videos
+    return sections.filter((section) => section.videos.length > 0);
   };
 
   const dynamicVideoSections = createVideoSections();
