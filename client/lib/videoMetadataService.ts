@@ -112,49 +112,36 @@ const getAuthHeaders = (): HeadersInit => {
 export const createVideoMetadata = async (
   videoData: CreateVideoData,
 ): Promise<VideoMetadata> => {
-  // Basic validation - only check truly required fields
-  if (
-    !videoData.title ||
-    typeof videoData.title !== "string" ||
-    videoData.title.trim() === ""
-  ) {
-    throw new Error("Title is required and must be a non-empty string");
-  }
+  // Minimal validation - just ensure required fields exist and enforce server limits
+  console.log("🔍 Validating video data before upload...");
 
-  if (
-    !videoData.description ||
-    typeof videoData.description !== "string" ||
-    videoData.description.trim() === ""
-  ) {
-    throw new Error("Description is required and must be a non-empty string");
-  }
-
-  // Check description length limit (server has 1000 character limit)
-  if (videoData.description.length > 1000) {
-    throw new Error(
-      `Description is too long (${videoData.description.length} characters). Maximum allowed is 1000 characters.`,
+  // Auto-fix common issues instead of throwing errors
+  if (videoData.description && videoData.description.length > 1000) {
+    console.warn(
+      `���️ Description too long (${videoData.description.length} chars), truncating to 1000`,
     );
+    videoData.description = videoData.description.substring(0, 1000);
   }
 
-  if (!videoData.videoUrl || typeof videoData.videoUrl !== "string") {
-    throw new Error("Video URL is required");
+  if (videoData.title && videoData.title.length > 200) {
+    console.warn(
+      `⚠️ Title too long (${videoData.title.length} chars), truncating to 200`,
+    );
+    videoData.title = videoData.title.substring(0, 200);
   }
 
-  if (!videoData.r2VideoKey || typeof videoData.r2VideoKey !== "string") {
-    throw new Error("R2 video key is required");
+  // Only throw errors for truly missing required fields
+  if (!videoData.title) {
+    throw new Error("Title is required");
   }
 
-  if (
-    !videoData.duration ||
-    typeof videoData.duration !== "number" ||
-    videoData.duration <= 0
-  ) {
-    throw new Error("Duration must be a positive number");
+  if (!videoData.description) {
+    throw new Error("Description is required");
   }
 
-  console.log("✅ Video data validation passed", {
-    titleLength: videoData.title.length,
-    descriptionLength: videoData.description.length,
+  console.log("✅ Video data validated and cleaned", {
+    title: `"${videoData.title}" (${videoData.title.length} chars)`,
+    description: `${videoData.description.length} chars`,
     hasVideoUrl: !!videoData.videoUrl,
     hasR2Key: !!videoData.r2VideoKey,
     duration: videoData.duration,
